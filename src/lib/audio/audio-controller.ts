@@ -40,6 +40,7 @@ export type StorageLike = {
 
 export type BackgroundAudioControllerOptions = {
   track: BackgroundTrack;
+  tracks?: readonly BackgroundTrack[];
   defaultMuted?: boolean;
   defaultVolume?: number;
   storage?: StorageLike | null;
@@ -108,6 +109,15 @@ export class BackgroundAudioController {
         this.#setState({ status: "paused", message: "Paused" });
       }
     });
+    this.#media.addEventListener("timeupdate", () => {
+      const end =
+        this.#track.snippetStartSeconds + this.#track.snippetDurationSeconds;
+      if (this.#media && this.#media.currentTime >= end) {
+        this.#media.pause();
+        this.#media.currentTime = this.#track.snippetStartSeconds;
+        this.#setState({ status: "paused", message: "Clip finished" });
+      }
+    });
     this.#media.addEventListener("error", () => {
       this.#setState({
         status: "error",
@@ -140,6 +150,14 @@ export class BackgroundAudioController {
       return false;
     }
     try {
+      const end =
+        this.#track.snippetStartSeconds + this.#track.snippetDurationSeconds;
+      if (
+        this.#media.currentTime < this.#track.snippetStartSeconds ||
+        this.#media.currentTime >= end
+      ) {
+        this.#media.currentTime = this.#track.snippetStartSeconds;
+      }
       await this.#media.play();
       this.#setState({ status: "playing", message: "Playing" });
       return true;
@@ -215,8 +233,11 @@ export const getBackgroundAudioController = (
     (typeof Audio === "undefined"
       ? undefined
       : () => new Audio() as unknown as MediaElementLike);
+  const tracks = options?.tracks ?? audioConfig.backgroundTracks;
+  const selectedTrack =
+    options?.track ?? tracks[Math.floor(Math.random() * tracks.length)] ?? audioConfig.backgroundTrack;
   backgroundAudioController = new BackgroundAudioController({
-    track: options?.track ?? audioConfig.backgroundTrack,
+    track: selectedTrack,
     defaultMuted: options?.defaultMuted ?? audioConfig.defaultMuted,
     defaultVolume: options?.defaultVolume ?? audioConfig.defaultVolume,
     storage,

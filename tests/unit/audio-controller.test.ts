@@ -18,6 +18,8 @@ const track: BackgroundTrack = {
   sourceKind: "bundled-placeholder",
   licenseNote: "Test fixture",
   loop: true,
+  snippetStartSeconds: 0,
+  snippetDurationSeconds: 30,
 };
 
 const createMedia = () => {

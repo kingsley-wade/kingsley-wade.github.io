@@ -18,6 +18,16 @@ Set `visibility: hidden` to keep a draft out of the page and public JSON. Never
 place private notes, credentials, raw CV files, or source photographs in a
 content collection.
 
+## Background music clips
+
+Place owner-supplied `.ogg` files in `public/audio/mock/`, then add one entry
+to `bundledTracks` in `src/config/audio.ts`. Set `snippetStartSeconds` and
+`snippetDurationSeconds` for the clip; the default configuration uses a
+30-second clip. One track is selected randomly when the audio controller is
+created. Keep the splash gate and default mute behavior in place because
+browsers may block autoplay. Confirm that every published track is yours or
+properly licensed before pushing it to GitHub Pages.
+
 ## Source ledger
 
 The initial personal facts were transcribed from these ignored local inputs on

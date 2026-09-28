@@ -7,8 +7,8 @@ const track = audioConfig.backgroundTrack;
 <aside class="audio-controls" data-audio-controls aria-label="Background music controls">
   <div class="audio-controls__track">
     <span class="audio-controls__label">NOW PLAYING</span>
-    <strong>{track.title}</strong>
-    <span>{track.artist}</span>
+    <strong data-audio-title>{track.title}</strong>
+    <span data-audio-artist>{track.artist}</span>
   </div>
   <div class="audio-controls__actions">
     <button type="button" data-audio-play aria-label="Play background music">
@@ -42,6 +42,11 @@ const track = audioConfig.backgroundTrack;
   const volumeInput = root?.querySelector<HTMLInputElement>("[data-audio-volume]");
   const status = root?.querySelector<HTMLElement>("[data-audio-status]");
   const controller = getBackgroundAudioController();
+  const title = root?.querySelector<HTMLElement>("[data-audio-title]");
+  const artist = root?.querySelector<HTMLElement>("[data-audio-artist]");
+
+  if (title) title.textContent = controller.track.title;
+  if (artist) artist.textContent = controller.track.artist;
 
   controller.subscribe((state) => {
     if (playButton) {

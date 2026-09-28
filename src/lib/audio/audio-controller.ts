@@ -72,7 +72,8 @@ const readPreference = (
 };
 
 export class BackgroundAudioController {
-  readonly #track: BackgroundTrack;
+  #track: BackgroundTrack;
+  readonly #tracks: readonly BackgroundTrack[];
   readonly #storage: StorageLike | null;
   readonly #media: MediaElementLike | null;
   readonly #listeners = new Set<(state: AudioState) => void>();
@@ -80,6 +81,7 @@ export class BackgroundAudioController {
 
   constructor(options: BackgroundAudioControllerOptions) {
     this.#track = options.track;
+    this.#tracks = options.tracks?.length ? options.tracks : [options.track];
     this.#storage = options.storage ?? null;
     const preference = readPreference(this.#storage, {
       muted: options.defaultMuted ?? true,
@@ -113,11 +115,10 @@ export class BackgroundAudioController {
       const end =
         this.#track.snippetStartSeconds + this.#track.snippetDurationSeconds;
       if (this.#media && this.#media.currentTime >= end) {
-        this.#media.pause();
-        this.#media.currentTime = this.#track.snippetStartSeconds;
-        this.#setState({ status: "paused", message: "Clip finished" });
+        void this.#playNextTrack();
       }
     });
+    this.#media.addEventListener("ended", () => void this.#playNextTrack());
     this.#media.addEventListener("error", () => {
       this.#setState({
         status: "error",
@@ -133,6 +134,23 @@ export class BackgroundAudioController {
 
   get track(): Readonly<BackgroundTrack> {
     return this.#track;
+  }
+
+  #pickNextTrack(): BackgroundTrack {
+    if (this.#tracks.length === 1) return this.#tracks[0];
+    const candidates = this.#tracks.filter((track) => track.id !== this.#track.id);
+    return candidates[Math.floor(Math.random() * candidates.length)] ?? this.#tracks[0];
+  }
+
+  async #playNextTrack(): Promise<boolean> {
+    if (!this.#media || !this.#state.available) return false;
+    const nextTrack = this.#pickNextTrack();
+    this.#track = nextTrack;
+    this.#media.pause();
+    this.#media.src = nextTrack.source ?? "";
+    this.#media.loop = nextTrack.loop;
+    this.#media.currentTime = nextTrack.snippetStartSeconds;
+    return this.play();
   }
 
   subscribe(listener: (state: AudioState) => void): () => void {

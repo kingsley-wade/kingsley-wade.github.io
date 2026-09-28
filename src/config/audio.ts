@@ -34,17 +34,6 @@ const configuredTrackUrl = import.meta.env.PUBLIC_BACKGROUND_AUDIO_URL?.trim();
 
 const bundledTracks: readonly BackgroundTrack[] = [
   {
-    id: "track-770908273",
-    title: "Track 770908273",
-    artist: "Owner supplied",
-    source: withBase("audio/mock/770908273-1-30232.ogg"),
-    sourceKind: "owner-supplied",
-    licenseNote: "Confirm publishing rights before deploying this file publicly.",
-    loop: false,
-    snippetStartSeconds: 0,
-    snippetDurationSeconds: 30,
-  },
-  {
     id: "waltz-for-window-seat",
     title: "A Waltz for the Window Seat",
     artist: "Owner supplied",

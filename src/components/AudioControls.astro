@@ -45,10 +45,9 @@ const track = audioConfig.backgroundTrack;
   const title = root?.querySelector<HTMLElement>("[data-audio-title]");
   const artist = root?.querySelector<HTMLElement>("[data-audio-artist]");
 
-  if (title) title.textContent = controller.track.title;
-  if (artist) artist.textContent = controller.track.artist;
-
   controller.subscribe((state) => {
+    if (title) title.textContent = controller.track.title;
+    if (artist) artist.textContent = controller.track.artist;
     if (playButton) {
       const playing = state.status === "playing";
       playButton.textContent = playing ? "PAUSE" : "PLAY";

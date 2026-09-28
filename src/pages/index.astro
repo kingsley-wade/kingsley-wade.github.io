@@ -1,0 +1,16 @@
+---
+import AppShell from "../components/AppShell.astro";
+import SplashGate from "../components/SplashGate.astro";
+import { sectionRegistry } from "../core/section-registry";
+import { getValidatedPublications } from "../lib/content/public-content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const publications = await getValidatedPublications();
+---
+
+<BaseLayout>
+  <SplashGate />
+  <div data-publication-count={publications.length}>
+    <AppShell sections={sectionRegistry} />
+  </div>
+</BaseLayout>

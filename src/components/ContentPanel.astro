@@ -1,0 +1,35 @@
+---
+import type { SectionManifest } from "../core/section-contract";
+
+type Props = {
+  section: SectionManifest;
+  number: number;
+  emptyMessage?: string;
+  active?: boolean;
+};
+
+const {
+  section,
+  number,
+  emptyMessage = "This section is being prepared.",
+  active = false,
+} = Astro.props;
+---
+
+<section
+  class="content-panel"
+  id={section.id}
+  data-section-panel={section.id}
+  data-active={active ? "true" : "false"}
+  aria-labelledby={`${section.id}-title`}
+>
+  <header class="content-panel__header">
+    <span aria-hidden="true">FILE {String(number).padStart(2, "0")}</span>
+    <h2 id={`${section.id}-title`} tabindex="-1">{section.label}</h2>
+  </header>
+  <div class="content-panel__body">
+    <slot>
+      <p class="content-panel__empty">{emptyMessage}</p>
+    </slot>
+  </div>
+</section>

@@ -1,0 +1,38 @@
+<section class="splash-gate" data-splash-gate aria-labelledby="splash-title">
+  <div class="splash-gate__scanline" aria-hidden="true"></div>
+  <p class="splash-gate__status">PLAYER 01 · READY</p>
+  <h1 id="splash-title">INSERT COIN</h1>
+  <p class="splash-gate__name">MANTING.GUO</p>
+  <div class="splash-gate__actions">
+    <button type="button" data-enter-mode="sound">START WITH SOUND</button>
+    <button type="button" data-enter-mode="muted">ENTER MUTED</button>
+  </div>
+</section>
+
+<script>
+  const gate = document.querySelector<HTMLElement>("[data-splash-gate]");
+
+  const enterSite = (muted: boolean) => {
+    if (!gate || gate.hidden) return;
+    gate.hidden = true;
+    document.documentElement.dataset.entered = "true";
+    window.dispatchEvent(new CustomEvent("site:entered", { detail: { muted } }));
+    document
+      .querySelector<HTMLElement>("[data-primary-menu] a")
+      ?.focus({ preventScroll: true });
+  };
+
+  gate?.addEventListener("click", (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
+      "[data-enter-mode]",
+    );
+    if (button) enterSite(button.dataset.enterMode === "muted");
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && gate && !gate.hidden) {
+      event.preventDefault();
+      enterSite(false);
+    }
+  });
+</script>

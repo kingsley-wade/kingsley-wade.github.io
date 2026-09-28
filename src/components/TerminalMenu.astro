@@ -1,0 +1,30 @@
+---
+import type { SectionManifest } from "../core/section-contract";
+
+type Props = {
+  sections: readonly SectionManifest[];
+};
+
+const { sections } = Astro.props;
+---
+
+<nav class="terminal-menu" aria-label="Primary sections" data-primary-menu>
+  <ol>
+    {
+      sections.map((section, index) => (
+        <li>
+          <a
+            href={`#${section.id}`}
+            data-section-link={section.id}
+            data-section-label={section.label}
+            data-audio-scale={section.audioScale}
+            aria-current={index === 0 ? "page" : undefined}
+          >
+            <span aria-hidden="true">[{index + 1}]</span>
+            <span>{section.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>

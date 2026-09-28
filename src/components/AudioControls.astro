@@ -1,0 +1,91 @@
+---
+import { audioConfig } from "../config/audio";
+
+const track = audioConfig.backgroundTrack;
+---
+
+<aside class="audio-controls" data-audio-controls aria-label="Background music controls">
+  <div class="audio-controls__track">
+    <span class="audio-controls__label">NOW PLAYING</span>
+    <strong>{track.title}</strong>
+    <span>{track.artist}</span>
+  </div>
+  <div class="audio-controls__actions">
+    <button type="button" data-audio-play aria-label="Play background music">
+      PLAY
+    </button>
+    <button type="button" data-audio-mute aria-label="Unmute background music">
+      UNMUTE
+    </button>
+    <label class="audio-controls__volume">
+      <span>VOL</span>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.05"
+        value={audioConfig.defaultVolume}
+        data-audio-volume
+        aria-label="Background music volume"
+      />
+    </label>
+  </div>
+  <p class="audio-controls__status" data-audio-status aria-live="polite">Ready</p>
+</aside>
+
+<script>
+  import { getBackgroundAudioController } from "../lib/audio/audio-controller";
+
+  const root = document.querySelector<HTMLElement>("[data-audio-controls]");
+  const playButton = root?.querySelector<HTMLButtonElement>("[data-audio-play]");
+  const muteButton = root?.querySelector<HTMLButtonElement>("[data-audio-mute]");
+  const volumeInput = root?.querySelector<HTMLInputElement>("[data-audio-volume]");
+  const status = root?.querySelector<HTMLElement>("[data-audio-status]");
+  const controller = getBackgroundAudioController();
+
+  controller.subscribe((state) => {
+    if (playButton) {
+      const playing = state.status === "playing";
+      playButton.textContent = playing ? "PAUSE" : "PLAY";
+      playButton.setAttribute(
+        "aria-label",
+        playing ? "Pause background music" : "Play background music",
+      );
+      playButton.disabled = !state.available;
+    }
+    if (muteButton) {
+      muteButton.textContent = state.muted ? "UNMUTE" : "MUTE";
+      muteButton.setAttribute(
+        "aria-label",
+        state.muted ? "Unmute background music" : "Mute background music",
+      );
+      muteButton.disabled = !state.available;
+    }
+    if (volumeInput) {
+      volumeInput.value = String(state.volume);
+      volumeInput.disabled = !state.available;
+    }
+    if (status) status.textContent = state.message;
+  });
+
+  playButton?.addEventListener("click", () => void controller.togglePlayback());
+  muteButton?.addEventListener("click", () => controller.toggleMuted());
+  volumeInput?.addEventListener("input", () => {
+    controller.setVolume(Number(volumeInput.value));
+  });
+
+  window.addEventListener("site:entered", (event) => {
+    const { muted } = (event as CustomEvent<{ muted: boolean }>).detail;
+    controller.setMuted(muted);
+    if (muted) {
+      controller.pause();
+    } else {
+      void controller.play();
+    }
+  });
+
+  window.addEventListener("terminal:audio", (event) => {
+    const { action } = (event as CustomEvent<{ action: string }>).detail;
+    if (action === "toggle-music") void controller.togglePlayback();
+  });
+</script>

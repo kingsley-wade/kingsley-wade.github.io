@@ -1,0 +1,38 @@
+---
+import { siteConfig } from "../config/site";
+import { activeTheme, themeStyle } from "../config/theme";
+import "../styles/global.css";
+
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const {
+  title = siteConfig.metadata.title,
+  description = siteConfig.metadata.description,
+} = Astro.props;
+const canonicalUrl = new URL(import.meta.env.BASE_URL, siteConfig.canonicalUrl).href;
+---
+
+<!doctype html>
+<html
+  lang={siteConfig.metadata.locale}
+  data-theme={activeTheme.id}
+  style={themeStyle}
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content={activeTheme.tokens.canvas} />
+    <meta name="site-base" content={import.meta.env.BASE_URL} />
+    <link rel="canonical" href={canonicalUrl} />
+    <title>{title}</title>
+    <script is:inline>document.documentElement.classList.add("js");</script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <slot />
+  </body>
+</html>

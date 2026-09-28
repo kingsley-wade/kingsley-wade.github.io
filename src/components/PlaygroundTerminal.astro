@@ -1,0 +1,93 @@
+<section class="playground-terminal" aria-label="Local playground terminal">
+  <header class="playground-terminal__header">
+    <span aria-hidden="true">LOCAL.SHELL</span>
+    <span class="playground-terminal__status">READY</span>
+  </header>
+  <ol class="playground-terminal__output" data-terminal-output aria-live="polite">
+    <li>local shell ready</li>
+  </ol>
+  <form class="playground-terminal__form" data-terminal-form>
+    <label for="terminal-command">Command</label>
+    <div class="playground-terminal__prompt">
+      <span aria-hidden="true">$</span>
+      <input
+        id="terminal-command"
+        name="command"
+        type="text"
+        maxlength="80"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+      />
+    </div>
+    <button type="submit">RUN</button>
+  </form>
+</section>
+
+<script>
+  import { executeTerminalCommand } from "../lib/terminal/commands";
+  import { parseTerminalInput } from "../lib/terminal/parser";
+
+  const form = document.querySelector<HTMLFormElement>("[data-terminal-form]");
+  const input = form?.elements.namedItem("command") as HTMLInputElement | null;
+  const output = document.querySelector<HTMLOListElement>("[data-terminal-output]");
+  const history: string[] = [];
+  let historyIndex = 0;
+
+  const appendLine = (line: string) => {
+    if (!output) return;
+    const item = document.createElement("li");
+    item.textContent = line;
+    output.append(item);
+    while (output.children.length > 50) output.firstElementChild?.remove();
+  };
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!input || !output) return;
+    const raw = input.value;
+    const parsed = parseTerminalInput(raw);
+    input.value = "";
+    if (parsed.kind === "empty") return;
+    if (raw.trim()) {
+      history.push(raw);
+      if (history.length > 50) history.shift();
+      historyIndex = history.length;
+    }
+    appendLine(`$ ${raw.trim()}`);
+    if (parsed.kind === "error") {
+      appendLine(parsed.message);
+      return;
+    }
+    const effect = executeTerminalCommand(parsed.command);
+    if (effect.clear) output.replaceChildren();
+    for (const line of effect.lines) appendLine(line);
+    if (effect.navigateTo) {
+      document
+        .querySelector<HTMLAnchorElement>(
+          `[data-section-link="${CSS.escape(effect.navigateTo)}"]`,
+        )
+        ?.click();
+    }
+    if (effect.audio) {
+      window.dispatchEvent(
+        new CustomEvent("terminal:audio", { detail: { action: effect.audio } }),
+      );
+    }
+    if (effect.interaction) {
+      window.dispatchEvent(
+        new CustomEvent("terminal:interaction", {
+          detail: { action: effect.interaction },
+        }),
+      );
+    }
+  });
+
+  input?.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+    event.preventDefault();
+    historyIndex += event.key === "ArrowUp" ? -1 : 1;
+    historyIndex = Math.max(0, Math.min(history.length, historyIndex));
+    input.value = history[historyIndex] ?? "";
+  });
+</script>

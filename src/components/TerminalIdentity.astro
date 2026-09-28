@@ -1,0 +1,27 @@
+---
+import { siteConfig } from "../config/site";
+import PixelPortrait from "./PixelPortrait.astro";
+---
+
+<header class="terminal-identity" aria-labelledby="site-owner">
+  <PixelPortrait />
+  <div class="terminal-identity__frame">
+    <p aria-hidden="true" class="terminal-identity__border">+-- PROFILE.SYS ----------------+</p>
+    <h1 id="site-owner">{siteConfig.identity.displayName}</h1>
+    <dl>
+      <div>
+        <dt>LOC</dt>
+        <dd>{siteConfig.identity.affiliation}</dd>
+      </div>
+      <div>
+        <dt>MODE</dt>
+        <dd>{siteConfig.identity.focus}</dd>
+      </div>
+      <div>
+        <dt>STATUS</dt>
+        <dd>Learning · researching · building</dd>
+      </div>
+    </dl>
+    <p aria-hidden="true" class="terminal-identity__border">+-------------------------------+</p>
+  </div>
+</header>

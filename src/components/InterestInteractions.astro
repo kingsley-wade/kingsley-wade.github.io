@@ -1,0 +1,104 @@
+<section class="interest-console" data-interest-console aria-label="Personal interest interactions">
+  <div class="interest-console__actions">
+    <button type="button" data-interest-action="reading">READ</button>
+    <button type="button" data-interest-action="fitness">MOVE</button>
+    <button type="button" data-interest-action="guitar">STRUM</button>
+  </div>
+  <div class="interest-console__scene" data-interest-scene aria-hidden="true">
+    <span class="interest-console__book">[|||]</span>
+    <span class="interest-console__meter">#####</span>
+    <span class="interest-console__strings">======</span>
+  </div>
+  <output class="interest-console__status" data-interest-status aria-live="polite">
+    SELECT AN INTEREST
+  </output>
+</section>
+
+<script>
+  import type { AudioScaleId } from "../core/section-contract";
+  import { getBackgroundAudioController } from "../lib/audio/audio-controller";
+  import { GuitarNoteEngine } from "../lib/audio/guitar-note-engine";
+
+  const root = document.querySelector<HTMLElement>("[data-interest-console]");
+  const scene = root?.querySelector<HTMLElement>("[data-interest-scene]");
+  const status = root?.querySelector<HTMLOutputElement>("[data-interest-status]");
+  const backgroundAudio = getBackgroundAudioController();
+  let guitarEngine: GuitarNoteEngine | null = null;
+  let effectTimer = 0;
+  let siteEntered = false;
+
+  const getGuitarEngine = () => {
+    if (guitarEngine) return guitarEngine;
+    if (typeof AudioContext === "undefined") return null;
+    guitarEngine = new GuitarNoteEngine({
+      context: new AudioContext(),
+      baseUrl: import.meta.env.BASE_URL,
+    });
+    guitarEngine.setMuted(backgroundAudio.state.muted);
+    return guitarEngine;
+  };
+
+  backgroundAudio.subscribe(({ muted }) => guitarEngine?.setMuted(muted));
+
+  const showEffect = (effect: "reading" | "fitness" | "guitar") => {
+    if (!scene || !status) return;
+    window.clearTimeout(effectTimer);
+    scene.dataset.effect = effect;
+    status.textContent =
+      effect === "reading"
+        ? "ONE PAGE FORWARD"
+        : effect === "fitness"
+          ? "MOVEMENT BREAK ACTIVE"
+          : "PLUCKING A SCALE NOTE";
+    effectTimer = window.setTimeout(() => {
+      delete scene.dataset.effect;
+      status.textContent = "READY";
+    }, 900);
+  };
+
+  const playGuitar = async (scale: AudioScaleId) => {
+    showEffect("guitar");
+    const result = await getGuitarEngine()?.playScale(scale);
+    if (!status || !result) {
+      if (status) status.textContent = "AUDIO UNAVAILABLE";
+      return;
+    }
+    status.textContent = result.played
+      ? `NOTE ${result.note}`
+      : result.reason === "muted"
+        ? "SOUND IS MUTED"
+        : "NOTE UNAVAILABLE";
+  };
+
+  const runInterest = (action: string) => {
+    if (action === "reading" || action === "fitness") showEffect(action);
+    if (action === "guitar") void playGuitar("e-minor-pentatonic");
+  };
+
+  root?.addEventListener("click", (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
+      "[data-interest-action]",
+    );
+    if (button?.dataset.interestAction) runInterest(button.dataset.interestAction);
+  });
+
+  window.addEventListener("terminal:interaction", (event) => {
+    runInterest((event as CustomEvent<{ action: string }>).detail.action);
+  });
+
+  window.addEventListener("terminal:audio", (event) => {
+    const { action } = (event as CustomEvent<{ action: string }>).detail;
+    if (action === "guitar") void playGuitar("e-blues");
+  });
+
+  window.addEventListener("site:entered", () => {
+    siteEntered = true;
+  });
+
+  window.addEventListener("section:changed", (event) => {
+    const { audioScale } = (
+      event as CustomEvent<{ id: string; audioScale: AudioScaleId | null }>
+    ).detail;
+    if (siteEntered && audioScale) void playGuitar(audioScale);
+  });
+</script>

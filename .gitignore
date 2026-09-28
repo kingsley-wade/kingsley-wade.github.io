@@ -1,7 +1,25 @@
+# Dependencies and generated output
+node_modules/
+.pnpm-store/
+.venv/
+dist/
+.astro/
+coverage/
+playwright-report/
+test-results/
+template-dist/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Local source material (never publish directly)
+/1.jpg
+/idphoto.jpg
+/cvfor_applied_math/
+
+# Operating system and editor files
 .DS_Store
-.bundle
-.jekyll-cache
-.sass-cache
-Gemfile.lock
-_site
-*.gem
+*.swp
+*.swo

@@ -1,0 +1,118 @@
+---
+import { render, type CollectionEntry } from "astro:content";
+
+import type { SectionManifest } from "../core/section-contract";
+import { getValidatedSectionEntries } from "../lib/content/public-content";
+import AudioControls from "./AudioControls.astro";
+import AssistantStatus from "./AssistantStatus.astro";
+import InterestInteractions from "./InterestInteractions.astro";
+import ContentPanel from "./ContentPanel.astro";
+import PlaygroundTerminal from "./PlaygroundTerminal.astro";
+import TerminalIdentity from "./TerminalIdentity.astro";
+import TerminalMenu from "./TerminalMenu.astro";
+
+type Props = {
+  sections: readonly SectionManifest[];
+};
+
+const { sections } = Astro.props;
+
+type CollectionName = "about" | "education" | "research" | "publications" | "misc";
+type AnyEntry = CollectionEntry<CollectionName>;
+type RenderedItem = {
+  entry: AnyEntry;
+  Content: Awaited<ReturnType<typeof render>>["Content"] | null;
+};
+
+const contentBySection = new Map<string, RenderedItem[]>();
+await Promise.all(
+  sections.map(async (section) => {
+    if (!section.contentCollection) return;
+    const entries = (await getValidatedSectionEntries(section)) as AnyEntry[];
+    const rendered = await Promise.all(
+      entries.map(async (entry) => ({
+        entry,
+        Content:
+          "body" in entry && entry.body
+            ? (await render(entry)).Content
+            : null,
+      })),
+    );
+    contentBySection.set(section.id, rendered);
+  }),
+);
+---
+
+<main id="main-content" class="app-shell">
+  <TerminalIdentity />
+  <AudioControls />
+  <AssistantStatus />
+  <div class="app-shell__workspace">
+    <TerminalMenu sections={sections} />
+    <div class="app-shell__content" aria-live="polite">
+      {
+        sections.map((section, index) => {
+          const items = contentBySection.get(section.id) ?? [];
+          return (
+            <ContentPanel section={section} number={index + 1} active={index === 0}>
+              {items.length > 0 ? (
+                <div class="content-list">
+                  {items.map(({ entry, Content }) => {
+                    const data = entry.data;
+                    return (
+                      <article class="content-entry" id={entry.id}>
+                        <header>
+                          {"period" in data && data.period ? (
+                            <p class="content-entry__period">{data.period}</p>
+                          ) : null}
+                          <h3>{data.title}</h3>
+                          {"institution" in data && data.institution ? (
+                            <p class="content-entry__institution">{data.institution}</p>
+                          ) : null}
+                        {"role" in data && data.role ? (
+                            <p class="content-entry__role">{data.role}</p>
+                          ) : null}
+                          {"authors" in data && data.authors ? (
+                            <p class="content-entry__authors">{data.authors.join(", ")}</p>
+                          ) : null}
+                        </header>
+                        {data.summary ? <p>{data.summary}</p> : null}
+                        {"detail" in data && data.detail ? <p>{data.detail}</p> : null}
+                        {"note" in data && data.note ? <p>{data.note}</p> : null}
+                        {"status" in data && data.status ? (
+                          <p class="content-entry__status">{data.status.replaceAll("-", " ")}</p>
+                        ) : null}
+                        {Content ? <Content /> : null}
+                        {data.links.length > 0 ? (
+                          <ul class="content-entry__links">
+                            {data.links.map((link) => (
+                              <li>
+                                <a href={link.url}>{link.label}</a>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
+                      </article>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p class="content-panel__empty">
+                  {section.emptyState ?? "This section is being prepared."}
+                </p>
+              )}
+              {section.renderer === "life" ? <InterestInteractions /> : null}
+              {section.renderer === "playground" ? <PlaygroundTerminal /> : null}
+            </ContentPanel>
+          );
+        })
+      }
+    </div>
+  </div>
+</main>
+
+<script>
+  import { initSectionRouter } from "../lib/navigation/router";
+
+  initSectionRouter();
+</script>

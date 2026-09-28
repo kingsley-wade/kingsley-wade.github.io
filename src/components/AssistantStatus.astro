@@ -1,0 +1,35 @@
+---
+import { siteConfig } from "../config/site";
+
+const configured = Boolean(siteConfig.assistantBaseUrl);
+---
+
+<aside
+  class="assistant-status"
+  data-assistant-status
+  data-assistant-base={siteConfig.assistantBaseUrl ?? ""}
+  aria-label="Personal assistant status"
+>
+  <span aria-hidden="true">AI&gt;</span>
+  <strong data-assistant-label>
+    {configured ? "assistant: checking" : "assistant: offline / not configured"}
+  </strong>
+</aside>
+
+<script>
+  import { createAssistantAdapter } from "../lib/assistant/adapter";
+
+  const root = document.querySelector<HTMLElement>("[data-assistant-status]");
+  const label = root?.querySelector<HTMLElement>("[data-assistant-label]");
+  const baseUrl = root?.dataset.assistantBase?.trim() || null;
+  const adapter = createAssistantAdapter(baseUrl);
+
+  if (adapter.kind === "http") {
+    void adapter.health().then((result) => {
+      if (!label) return;
+      label.textContent = result.ok
+        ? `assistant: online / ${result.data.version}`
+        : `assistant: offline / ${result.error.code}`;
+    });
+  }
+</script>

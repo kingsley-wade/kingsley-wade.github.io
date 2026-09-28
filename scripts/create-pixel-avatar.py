@@ -10,10 +10,13 @@ OUTPUT_DIR = ROOT / "public" / "images"
 
 PIXEL_SIZE = 96
 PORTRAIT_SIZE = 84
-PASTEL_BLUE = (221, 239, 252)
-PASTEL_MINT = (221, 244, 232)
-PASTEL_LAVENDER = (233, 225, 247)
-INK = (24, 50, 74)
+CYBER_VOID = (5, 12, 26)
+CYBER_NAVY = (9, 27, 52)
+CYBER_INK = (19, 43, 73)
+CYBER_CYAN = (22, 214, 208)
+CYBER_ICE = (138, 248, 255)
+CYBER_VIOLET = (158, 91, 255)
+CYBER_WHITE = (224, 251, 255)
 
 
 def normalized_portrait(path: Path, crop: tuple[int, int, int, int]) -> Image.Image:
@@ -39,9 +42,7 @@ def replace_studio_background(image: Image.Image) -> Image.Image:
             ) < 32
             edge_region = y < 58 and (x < 18 or x > 65 or y < 9)
             if near_white and edge_region:
-                pixels[x, y] = (
-                    PASTEL_MINT if ((x // 8) + (y // 8)) % 2 == 0 else PASTEL_LAVENDER
-                )
+                pixels[x, y] = CYBER_NAVY if ((x // 8) + (y // 8)) % 2 == 0 else CYBER_INK
     return result
 
 
@@ -64,19 +65,56 @@ def pixel_mask() -> Image.Image:
     return mask
 
 
+def block_face_mask(size: int = 68) -> Image.Image:
+    mask = Image.new("L", (size, size), 0)
+    draw = ImageDraw.Draw(mask)
+    draw.rectangle((5, 0, size - 6, size - 1), fill=255)
+    draw.rectangle((0, 7, size - 1, size - 9), fill=255)
+    return mask
+
+
+def cyber_grade(image: Image.Image) -> Image.Image:
+    gray = ImageOps.grayscale(image)
+    graded = ImageOps.colorize(gray, black=CYBER_INK, white=CYBER_WHITE)
+    graded = Image.blend(graded, image, 0.18)
+    return ImageEnhance.Contrast(graded).enhance(1.24)
+
+
 def create_avatar() -> Image.Image:
     primary = normalized_portrait(PRIMARY_SOURCE, (48, 24, 504, 625))
     secondary = normalized_portrait(SECONDARY_SOURCE, (3, 0, 292, 374))
     blended = Image.blend(primary, secondary, 0.08)
     blended = replace_studio_background(blended)
-    blended = ImageEnhance.Color(blended).enhance(0.92)
-    blended = ImageEnhance.Contrast(blended).enhance(1.16)
-    blended = blended.quantize(colors=24, method=Image.Quantize.MEDIANCUT).convert("RGB")
+    blended = cyber_grade(blended)
+    blended = blended.quantize(colors=20, method=Image.Quantize.MEDIANCUT).convert("RGB")
 
-    canvas = Image.new("RGB", (PIXEL_SIZE, PIXEL_SIZE), PASTEL_BLUE)
+    canvas = Image.new("RGB", (PIXEL_SIZE, PIXEL_SIZE), CYBER_VOID)
     draw = ImageDraw.Draw(canvas)
-    draw.rectangle((2, 2, PIXEL_SIZE - 3, PIXEL_SIZE - 3), outline=INK, width=2)
-    canvas.paste(blended, (6, 6), pixel_mask())
+    # Minecraft-like shoulders and a stepped helmet silhouette.
+    draw.rectangle((8, 76, 87, 93), fill=CYBER_INK)
+    draw.rectangle((16, 70, 79, 93), fill=CYBER_NAVY)
+    draw.rectangle((24, 82, 71, 95), fill=CYBER_CYAN)
+    draw.rectangle((31, 82, 64, 95), fill=CYBER_INK)
+    draw.rectangle((10, 8, 85, 75), fill=CYBER_CYAN)
+    draw.rectangle((15, 12, 80, 72), fill=CYBER_NAVY)
+    draw.rectangle((20, 17, 75, 69), fill=CYBER_INK)
+    face = blended.resize((68, 68), Image.Resampling.NEAREST)
+    canvas.paste(face, (14, 10), block_face_mask())
+
+    # Visor, hair blocks, and energy bars keep the character readable at 96px.
+    draw.rectangle((14, 10, 24, 18), fill=CYBER_CYAN)
+    draw.rectangle((72, 10, 82, 18), fill=CYBER_CYAN)
+    draw.rectangle((20, 25, 75, 37), fill=CYBER_INK)
+    draw.rectangle((25, 28, 70, 31), fill=CYBER_ICE)
+    draw.rectangle((31, 32, 39, 35), fill=CYBER_CYAN)
+    draw.rectangle((57, 32, 65, 35), fill=CYBER_CYAN)
+    draw.rectangle((21, 58, 75, 68), fill=CYBER_NAVY)
+    draw.rectangle((29, 60, 67, 64), fill=CYBER_VIOLET)
+    draw.rectangle((29, 60, 50, 62), fill=CYBER_ICE)
+    draw.rectangle((4, 4, 12, 7), fill=CYBER_VIOLET)
+    draw.rectangle((84, 88, 91, 91), fill=CYBER_VIOLET)
+    draw.rectangle((2, 2, PIXEL_SIZE - 3, PIXEL_SIZE - 3), outline=CYBER_CYAN, width=2)
+    draw.rectangle((6, 6, 9, 9), fill=CYBER_ICE)
     return canvas
 
 

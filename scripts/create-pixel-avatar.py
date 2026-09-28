@@ -1,3 +1,5 @@
+"""Create the site's pixel portrait from local, ignored photo references."""
+
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageEnhance, ImageOps
@@ -5,135 +7,118 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
 PRIMARY_SOURCE = ROOT / "1.jpg"
-SECONDARY_SOURCE = ROOT / "idphoto.jpg"
 OUTPUT_DIR = ROOT / "public" / "images"
-
-PIXEL_SIZE = 96
-PORTRAIT_SIZE = 84
-CYBER_VOID = (5, 12, 26)
-CYBER_NAVY = (9, 27, 52)
-CYBER_INK = (19, 43, 73)
-CYBER_CYAN = (22, 214, 208)
-CYBER_ICE = (138, 248, 255)
-CYBER_VIOLET = (158, 91, 255)
-CYBER_WHITE = (224, 251, 255)
-
-
-def normalized_portrait(path: Path, crop: tuple[int, int, int, int]) -> Image.Image:
-    with Image.open(path) as source:
-        rgb = ImageOps.exif_transpose(source).convert("RGB")
-        cropped = rgb.crop(crop)
-        return ImageOps.fit(
-            cropped,
-            (PORTRAIT_SIZE, PORTRAIT_SIZE),
-            method=Image.Resampling.LANCZOS,
-            centering=(0.5, 0.42),
-        )
+GRID = 128
+NAVY = (5, 20, 39)
+GRID_BLUE = (10, 43, 72)
+GRID_GLOW = (13, 57, 88)
+HAIR = (26, 21, 30)
+HAIR_SHADE = (18, 16, 24)
+SKIN_SHADOW = (187, 116, 70)
+FRAME = (7, 11, 19)
+CYAN = (45, 225, 218)
+ICE = (173, 250, 255)
+SHIRT = (229, 239, 248)
 
 
-def replace_studio_background(image: Image.Image) -> Image.Image:
-    result = image.copy()
-    pixels = result.load()
-    for y in range(PORTRAIT_SIZE):
-        for x in range(PORTRAIT_SIZE):
-            red, green, blue = pixels[x, y]
-            near_white = min(red, green, blue) > 212 and max(red, green, blue) - min(
-                red, green, blue
-            ) < 32
-            edge_region = y < 58 and (x < 18 or x > 65 or y < 9)
-            if near_white and edge_region:
-                pixels[x, y] = CYBER_NAVY if ((x // 8) + (y // 8)) % 2 == 0 else CYBER_INK
-    return result
+def face_reference() -> tuple[Image.Image, Image.Image]:
+    with Image.open(PRIMARY_SOURCE) as source:
+        photo = ImageOps.exif_transpose(source).convert("RGB")
+        crop = photo.crop((82, 62, 472, 500))
+        face = ImageOps.fit(crop, (82, 65), method=Image.Resampling.LANCZOS, centering=(0.5, 0.47))
+        face = ImageEnhance.Color(face).enhance(1.12)
+        face = ImageEnhance.Contrast(face).enhance(1.08)
+        face = face.quantize(colors=28, method=Image.Quantize.MEDIANCUT).convert("RGB")
+        mask = Image.new("L", face.size, 255)
+        pixels = face.load()
+        mask_pixels = mask.load()
+        for y in range(face.height):
+            for x in range(face.width):
+                red, green, blue = pixels[x, y]
+                if min(red, green, blue) > 205 and max(red, green, blue) - min(red, green, blue) < 34:
+                    mask_pixels[x, y] = 0
+        return face, mask
 
 
-def pixel_mask() -> Image.Image:
-    mask = Image.new("L", (PORTRAIT_SIZE, PORTRAIT_SIZE), 0)
-    draw = ImageDraw.Draw(mask)
-    draw.polygon(
-        [
-            (6, 0),
-            (PORTRAIT_SIZE - 7, 0),
-            (PORTRAIT_SIZE - 1, 6),
-            (PORTRAIT_SIZE - 1, PORTRAIT_SIZE - 7),
-            (PORTRAIT_SIZE - 7, PORTRAIT_SIZE - 1),
-            (6, PORTRAIT_SIZE - 1),
-            (0, PORTRAIT_SIZE - 7),
-            (0, 6),
-        ],
-        fill=255,
-    )
-    return mask
+def draw_grid(draw: ImageDraw.ImageDraw) -> None:
+    draw.rectangle((0, 0, GRID - 1, GRID - 1), fill=NAVY)
+    for x in range(0, GRID, 6):
+        draw.rectangle((x, 0, x + 1, GRID - 1), fill=GRID_BLUE)
+    for y in range(0, GRID, 6):
+        draw.rectangle((0, y, GRID - 1, y + 1), fill=GRID_BLUE)
+    for x, y, glyph in ((8, 35, "101"), (104, 22, "<>"), (8, 76, "+_"), (101, 81, "01")):
+        for index, char in enumerate(glyph):
+            if char == "1":
+                draw.rectangle((x + index * 5, y, x + 2 + index * 5, y + 10), fill=GRID_GLOW)
+            elif char == "+":
+                draw.rectangle((x, y + 4, x + 10, y + 6), fill=GRID_GLOW)
+                draw.rectangle((x + 4, y, x + 6, y + 10), fill=GRID_GLOW)
+            else:
+                draw.rectangle((x + index * 5, y, x + 2 + index * 5, y + 2), fill=GRID_GLOW)
 
 
-def block_face_mask(size: int = 68) -> Image.Image:
-    mask = Image.new("L", (size, size), 0)
-    draw = ImageDraw.Draw(mask)
-    draw.rectangle((5, 0, size - 6, size - 1), fill=255)
-    draw.rectangle((0, 7, size - 1, size - 9), fill=255)
-    return mask
-
-
-def cyber_grade(image: Image.Image) -> Image.Image:
-    gray = ImageOps.grayscale(image)
-    graded = ImageOps.colorize(gray, black=CYBER_INK, white=CYBER_WHITE)
-    graded = Image.blend(graded, image, 0.18)
-    return ImageEnhance.Contrast(graded).enhance(1.24)
+def draw_bear(draw: ImageDraw.ImageDraw) -> None:
+    outline, brown, tan, pink = (55, 33, 29), (147, 91, 57), (239, 178, 105), (244, 133, 146)
+    draw.rectangle((53, 95, 59, 101), fill=outline)
+    draw.rectangle((70, 95, 76, 101), fill=outline)
+    draw.rectangle((54, 96, 58, 99), fill=brown)
+    draw.rectangle((71, 96, 75, 99), fill=brown)
+    draw.rectangle((51, 99, 78, 116), fill=outline)
+    draw.rectangle((54, 101, 75, 114), fill=brown)
+    draw.rectangle((57, 104, 72, 112), fill=tan)
+    draw.rectangle((59, 106, 61, 108), fill=outline)
+    draw.rectangle((68, 106, 70, 108), fill=outline)
+    draw.rectangle((63, 109, 66, 111), fill=pink)
+    draw.rectangle((61, 112, 68, 114), fill=outline)
 
 
 def create_avatar() -> Image.Image:
-    primary = normalized_portrait(PRIMARY_SOURCE, (48, 24, 504, 625))
-    secondary = normalized_portrait(SECONDARY_SOURCE, (3, 0, 292, 374))
-    blended = Image.blend(primary, secondary, 0.08)
-    blended = replace_studio_background(blended)
-    blended = cyber_grade(blended)
-    blended = blended.quantize(colors=20, method=Image.Quantize.MEDIANCUT).convert("RGB")
-
-    canvas = Image.new("RGB", (PIXEL_SIZE, PIXEL_SIZE), CYBER_VOID)
+    canvas = Image.new("RGB", (GRID, GRID), NAVY)
     draw = ImageDraw.Draw(canvas)
-    # Minecraft-like shoulders and a stepped helmet silhouette.
-    draw.rectangle((8, 76, 87, 93), fill=CYBER_INK)
-    draw.rectangle((16, 70, 79, 93), fill=CYBER_NAVY)
-    draw.rectangle((24, 82, 71, 95), fill=CYBER_CYAN)
-    draw.rectangle((31, 82, 64, 95), fill=CYBER_INK)
-    draw.rectangle((10, 8, 85, 75), fill=CYBER_CYAN)
-    draw.rectangle((15, 12, 80, 72), fill=CYBER_NAVY)
-    draw.rectangle((20, 17, 75, 69), fill=CYBER_INK)
-    face = blended.resize((68, 68), Image.Resampling.NEAREST)
-    canvas.paste(face, (14, 10), block_face_mask())
+    draw_grid(draw)
+    draw.polygon([(15, 128), (15, 108), (25, 100), (45, 93), (83, 93), (104, 100), (114, 108), (114, 128)], fill=FRAME)
+    draw.polygon([(17, 128), (17, 110), (27, 102), (46, 96), (82, 96), (101, 102), (111, 110), (111, 128)], fill=SHIRT)
+    draw.rectangle((54, 86, 73, 101), fill=SKIN_SHADOW)
+    draw.rectangle((59, 88, 68, 102), fill=(211, 139, 85))
+    draw_bear(draw)
 
-    # Visor, hair blocks, and energy bars keep the character readable at 96px.
-    draw.rectangle((14, 10, 24, 18), fill=CYBER_CYAN)
-    draw.rectangle((72, 10, 82, 18), fill=CYBER_CYAN)
-    draw.rectangle((20, 25, 75, 37), fill=CYBER_INK)
-    draw.rectangle((25, 28, 70, 31), fill=CYBER_ICE)
-    draw.rectangle((31, 32, 39, 35), fill=CYBER_CYAN)
-    draw.rectangle((57, 32, 65, 35), fill=CYBER_CYAN)
-    draw.rectangle((21, 58, 75, 68), fill=CYBER_NAVY)
-    draw.rectangle((29, 60, 67, 64), fill=CYBER_VIOLET)
-    draw.rectangle((29, 60, 50, 62), fill=CYBER_ICE)
-    draw.rectangle((4, 4, 12, 7), fill=CYBER_VIOLET)
-    draw.rectangle((84, 88, 91, 91), fill=CYBER_VIOLET)
-    draw.rectangle((2, 2, PIXEL_SIZE - 3, PIXEL_SIZE - 3), outline=CYBER_CYAN, width=2)
-    draw.rectangle((6, 6, 9, 9), fill=CYBER_ICE)
+    face, face_mask = face_reference()
+    face = face.resize((82, 65), Image.Resampling.NEAREST)
+    face_mask = face_mask.resize((82, 65), Image.Resampling.NEAREST)
+    canvas.paste(face, (23, 29), face_mask)
+    draw.rectangle((19, 39, 24, 68), fill=SKIN_SHADOW)
+    draw.rectangle((104, 39, 109, 68), fill=SKIN_SHADOW)
+    draw.rectangle((25, 24, 101, 35), fill=HAIR)
+    draw.rectangle((31, 18, 95, 29), fill=HAIR)
+    draw.rectangle((39, 12, 88, 22), fill=HAIR)
+    draw.rectangle((25, 28, 36, 45), fill=HAIR_SHADE)
+    draw.rectangle((91, 27, 102, 45), fill=HAIR_SHADE)
+    draw.rectangle((42, 25, 47, 36), fill=HAIR)
+    draw.rectangle((57, 23, 63, 34), fill=HAIR)
+    draw.rectangle((77, 23, 82, 34), fill=HAIR)
+    draw.rectangle((43, 52, 56, 55), fill=FRAME)
+    draw.rectangle((70, 51, 84, 54), fill=FRAME)
+    draw.rectangle((45, 56, 56, 65), fill=(2, 4, 8))
+    draw.rectangle((47, 58, 54, 63), fill=(8, 10, 15))
+    draw.rectangle((51, 58, 54, 60), fill=SHIRT)
+    draw.rectangle((70, 55, 88, 65), fill=(76, 83, 96))
+    draw.rectangle((73, 54, 86, 64), fill=(19, 39, 59))
+    draw.rectangle((78, 57, 83, 60), fill=ICE)
+    draw.rectangle((87, 53, 91, 64), fill=CYAN)
+    draw.rectangle((90, 56, 92, 61), fill=ICE)
+    draw.rectangle((56, 74, 71, 77), fill=FRAME)
+    draw.rectangle((62, 67, 64, 69), fill=(148, 82, 57))
+    draw.rectangle((4, 4, 123, 5), fill=GRID_GLOW)
+    draw.rectangle((4, 4, 5, 123), fill=GRID_GLOW)
     return canvas
 
 
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     avatar = create_avatar()
-    for size, filename in (
-        (384, "avatar-pixel.webp"),
-        (768, "avatar-pixel@2x.webp"),
-    ):
+    for size, filename in ((384, "avatar-pixel.webp"), (768, "avatar-pixel@2x.webp")):
         output = avatar.resize((size, size), Image.Resampling.NEAREST)
-        output.save(
-            OUTPUT_DIR / filename,
-            format="WEBP",
-            lossless=True,
-            method=6,
-            exif=b"",
-            xmp=b"",
-        )
+        output.save(OUTPUT_DIR / filename, format="WEBP", lossless=True, method=6, exif=b"", xmp=b"")
 
 
 if __name__ == "__main__":

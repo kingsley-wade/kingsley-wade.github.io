@@ -2,20 +2,18 @@
 
 ## Goal
 
-Replace the current pastel pixel portrait with a clearer cyber game character
-that retains a few personal features. The result should feel like a Minecraft
-style block avatar and terminal character, without needing to reproduce the
-owner's face faithfully.
+Replace the current pastel pixel portrait with a reference-inspired cyber
+pixel portrait. The result should use the supplied block-face composition,
+while retaining a few personal features from the owner's photo.
 
 ## Visual direction
 
 The selected direction is **A · Cyber Miner**:
 
-- A square, block-built head and shoulder silhouette.
-- Deep navy background and terminal border.
-- Cyan visor or rim light as the main cyber signal.
-- Dark blue face or helmet interior to preserve readable facial structure.
-- Violet energy strip as a small secondary accent.
+- A large square, block-built head with black hair and white shirt.
+- Deep navy code-grid background.
+- A single cyan cyber monocle over the right eye.
+- A small pixel bear badge on the shirt as a personal detail.
 - Pixel edges and nearest-neighbor scaling at every published size.
 
 The two local photographs remain visual references for face proportion, hair
@@ -39,8 +37,9 @@ content tests remain valid.
 
 The change is limited to `scripts/create-pixel-avatar.py` and generated avatar
 files. The script uses a quantized portrait as the face layer, then adds
-deterministic block geometry, visor highlights, shoulder pixels, and a dark
-cyber palette. Pillow is used only by this offline asset-generation script; it
+deterministic block hair, asymmetric cyber glasses, shirt geometry, a bear
+badge, and a dark code-grid backdrop. Pillow is used only by this offline
+asset-generation script; it
 is not a site runtime dependency. No browser interaction is required.
 
 ## Verification

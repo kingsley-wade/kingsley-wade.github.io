@@ -618,6 +618,18 @@ button:active {
   white-space: pre-wrap;
 }
 
+.playground-terminal__output li[data-line-kind="command"] {
+  color: var(--color-accent);
+}
+
+.playground-terminal__output li[data-line-kind="error"] {
+  color: var(--color-highlight);
+}
+
+.playground-terminal__output li[data-line-kind="help"] {
+  color: var(--color-ink-muted);
+}
+
 .playground-terminal__form {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 5rem;
@@ -638,13 +650,19 @@ button:active {
 
 .playground-terminal__prompt {
   display: grid;
-  grid-template-columns: 1rem minmax(0, 1fr);
+  grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
   gap: var(--space-2);
   min-width: 0;
   padding-inline: var(--space-3);
   border: var(--line-pixel) solid var(--color-ink);
   background: var(--color-canvas);
+  overflow: hidden;
+}
+
+.playground-terminal__prompt > span {
+  color: var(--color-link);
+  white-space: nowrap;
 }
 
 .playground-terminal__prompt input {

@@ -11,5 +11,6 @@ export default defineSection({
   renderer: "playground",
   audioScale: "e-blues",
   terminalCommands: ["help", "guitar", "music", "clear"],
+  terminalAliases: ["play"],
   visibility: "public",
 });

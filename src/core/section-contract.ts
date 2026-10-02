@@ -25,6 +25,12 @@ export type AudioScaleId = (typeof audioScaleIds)[number];
 
 export const terminalCommandIds = [
   "help",
+  "ls",
+  "cd",
+  "pwd",
+  "tree",
+  "open",
+  "status",
   "about",
   "books",
   "guitar",
@@ -45,6 +51,7 @@ export type SectionManifest = {
   renderer: RendererId;
   audioScale: AudioScaleId;
   terminalCommands?: TerminalCommandId[];
+  terminalAliases?: string[];
   visibility: SectionVisibility;
 };
 

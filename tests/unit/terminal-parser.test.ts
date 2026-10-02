@@ -28,9 +28,11 @@ describe("terminal parser", () => {
     expect(executeTerminalCommand("fitness")).toMatchObject({ interaction: "fitness" });
   });
 
-  it("rejects unknown, multi-word, and overlong input", () => {
-    expect(parseTerminalInput("open https://example.com")).toMatchObject({
-      kind: "error",
+  it("parses arguments and rejects overlong input", () => {
+    expect(parseTerminalInput("open research")).toEqual({
+      kind: "command",
+      command: "open",
+      args: ["research"],
     });
     expect(parseTerminalInput("x".repeat(81))).toEqual({
       kind: "error",

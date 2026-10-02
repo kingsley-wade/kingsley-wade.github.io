@@ -8,5 +8,6 @@ export default defineSection({
   contentCollection: "research",
   renderer: "default",
   audioScale: "d-dorian",
+  terminalAliases: ["lab"],
   visibility: "public",
 });

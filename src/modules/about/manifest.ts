@@ -9,5 +9,6 @@ export default defineSection({
   renderer: "default",
   audioScale: "c-major",
   terminalCommands: ["about"],
+  terminalAliases: ["me"],
   visibility: "public",
 });

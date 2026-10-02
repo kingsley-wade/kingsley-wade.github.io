@@ -19,6 +19,7 @@ export const validateSectionRegistry = (
   const errors: string[] = [];
   const ids = new Map<string, string>();
   const orders = new Map<number, string>();
+  const aliases = new Map<string, string>();
 
   for (const { source, manifest } of entries) {
     if (!/^[a-z][a-z0-9-]*$/.test(manifest.id)) {
@@ -46,6 +47,17 @@ export const validateSectionRegistry = (
     for (const command of manifest.terminalCommands ?? []) {
       if (!isOneOf(command, terminalCommandIds)) {
         errors.push(`${source}: unknown terminal command "${command}"`);
+      }
+    }
+    for (const alias of manifest.terminalAliases ?? []) {
+      if (!/^[a-z][a-z0-9-]*$/.test(alias)) {
+        errors.push(`${source}: invalid terminal alias "${alias}"`);
+      }
+      const previousAlias = aliases.get(alias);
+      if (previousAlias) {
+        errors.push(`${source}: duplicate terminal alias "${alias}" also used by ${previousAlias}`);
+      } else {
+        aliases.set(alias, source);
       }
     }
 

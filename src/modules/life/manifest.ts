@@ -11,5 +11,6 @@ export default defineSection({
   renderer: "life",
   audioScale: "e-minor-pentatonic",
   terminalCommands: ["books", "fitness"],
+  terminalAliases: ["daily"],
   visibility: "public",
 });

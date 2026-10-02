@@ -92,3 +92,29 @@ test("assistant remains offline without making a network request", async ({
   await expect(page.locator("[data-assistant-status] input")).toHaveCount(0);
   expect(assistantRequests).toEqual([]);
 });
+
+test("playground terminal explores sections as a local filesystem", async ({ page }) => {
+  await page.goto("/#playground");
+  await page.getByRole("button", { name: "ENTER MUTED" }).click();
+
+  const terminal = page.locator("[data-terminal]");
+  const input = terminal.locator("input[name=command]");
+  await input.fill("ls");
+  await input.press("Enter");
+  await expect(terminal).toContainText("research/");
+
+  await input.fill("cd lab");
+  await input.press("Enter");
+  await expect(page).toHaveURL(/#research$/);
+
+  await page.getByRole("link", { name: /Playground/ }).click();
+  await input.fill("pwd");
+  await input.press("Enter");
+  await expect(terminal).toContainText("/playground$ pwd");
+
+  await input.fill("cd ..");
+  await input.press("Enter");
+  await input.fill("pwd");
+  await input.press("Enter");
+  await expect(terminal).toContainText("guest@local:/$ pwd");
+});

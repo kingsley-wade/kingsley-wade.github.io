@@ -62,11 +62,13 @@ describe("section router", () => {
     expect(calls.titles).toEqual(["Research"]);
   });
 
-  it("uses replaceState for empty and unknown hashes", () => {
+  it("activates the fallback for an empty hash without rewriting the URL", () => {
     const empty = createAdapter("");
     expect(createSectionRouter(routes, empty.adapter).activeId).toBe("about");
-    expect(empty.calls.replacements).toEqual(["#about"]);
+    expect(empty.calls.replacements).toEqual([]);
+  });
 
+  it("uses replaceState for unknown hashes", () => {
     const unknown = createAdapter("#missing");
     expect(createSectionRouter(routes, unknown.adapter).activeId).toBe("about");
     expect(unknown.calls.fallbacks).toEqual(["#missing"]);

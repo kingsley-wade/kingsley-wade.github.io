@@ -58,7 +58,6 @@ export const createSectionRouter = (
     const rawHash = adapter.readHash();
     const requested = sectionIdFromHash(rawHash);
     if (!requested) {
-      adapter.replaceHash(`#${fallback.id}`);
       activate(fallback.id, focusPanel);
       return;
     }

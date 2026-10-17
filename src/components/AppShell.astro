@@ -3,6 +3,7 @@ import { render, type CollectionEntry } from "astro:content";
 
 import type { SectionManifest } from "../core/section-contract";
 import { getValidatedSectionEntries } from "../lib/content/public-content";
+import { getValidatedShares } from "../lib/content/public-content";
 import AudioControls from "./AudioControls.astro";
 import AssistantStatus from "./AssistantStatus.astro";
 import InterestInteractions from "./InterestInteractions.astro";
@@ -10,6 +11,7 @@ import ContentPanel from "./ContentPanel.astro";
 import PlaygroundTerminal from "./PlaygroundTerminal.astro";
 import TerminalIdentity from "./TerminalIdentity.astro";
 import TerminalMenu from "./TerminalMenu.astro";
+import PlaygroundShares from "./PlaygroundShares.astro";
 
 type Props = {
   sections: readonly SectionManifest[];
@@ -25,6 +27,7 @@ type RenderedItem = {
 };
 
 const contentBySection = new Map<string, RenderedItem[]>();
+const shares = await getValidatedShares();
 await Promise.all(
   sections.map(async (section) => {
     if (!section.contentCollection) return;
@@ -102,7 +105,15 @@ await Promise.all(
                 </p>
               )}
               {section.renderer === "life" ? <InterestInteractions /> : null}
-              {section.renderer === "playground" ? <PlaygroundTerminal sections={sections} /> : null}
+              {section.renderer === "playground" ? (
+                <>
+                  <PlaygroundShares entries={shares} />
+                  <PlaygroundTerminal
+                    sections={sections}
+                    shares={shares.map(({ id, data }) => ({ id, kind: data.kind, title: data.title }))}
+                  />
+                </>
+              ) : null}
             </ContentPanel>
           );
         })

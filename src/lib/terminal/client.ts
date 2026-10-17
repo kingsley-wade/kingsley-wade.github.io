@@ -2,8 +2,12 @@ import { executeTerminalCommand } from "./commands";
 import { createTerminalFilesystem } from "./filesystem";
 import { parseTerminalInput } from "./parser";
 import type { SectionManifest } from "../../core/section-contract";
+import type { TerminalShare } from "./filesystem";
 
-export const initPlaygroundTerminal = (sections: readonly SectionManifest[]): void => {
+export const initPlaygroundTerminal = (
+  sections: readonly SectionManifest[],
+  shares: readonly TerminalShare[] = [],
+): void => {
   const terminal = document.querySelector<HTMLElement>("[data-terminal]");
   const form = terminal?.querySelector<HTMLFormElement>("[data-terminal-form]");
   const input = form?.elements.namedItem("command") as HTMLInputElement | null;
@@ -11,7 +15,7 @@ export const initPlaygroundTerminal = (sections: readonly SectionManifest[]): vo
   const prompt = terminal?.querySelector<HTMLElement>("[data-terminal-prompt]");
   const status = terminal?.querySelector<HTMLElement>("[data-terminal-status]");
   if (!form || !input || !output) return;
-  const filesystem = createTerminalFilesystem(sections);
+  const filesystem = createTerminalFilesystem(sections, shares);
   const history: string[] = [];
   let historyIndex = 0;
   const updatePrompt = () => {
@@ -43,9 +47,24 @@ export const initPlaygroundTerminal = (sections: readonly SectionManifest[]): vo
     if (effect.clear) output.replaceChildren();
     for (const line of effect.lines) appendLine(line, parsed.command === "help" ? "help" : "output");
     if (effect.currentPath) updatePrompt();
+    if (effect.pathChanged) {
+      window.dispatchEvent(
+        new CustomEvent("terminal:path-changed", {
+          detail: { path: effect.currentPath },
+        }),
+      );
+    }
     if (status) status.textContent = effect.navigateTo ? "OPEN" : "READY";
     if (effect.navigateTo) {
       document.querySelector<HTMLAnchorElement>(`[data-section-link="${CSS.escape(effect.navigateTo)}"]`)?.click();
+    }
+    if (effect.focusItemId) {
+      document
+        .querySelector<HTMLElement>(`[data-share-id="${CSS.escape(effect.focusItemId)}"]`)
+        ?.focus({ preventScroll: true });
+      document
+        .querySelector<HTMLElement>(`[data-share-id="${CSS.escape(effect.focusItemId)}"]`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
     if (effect.audio) window.dispatchEvent(new CustomEvent("terminal:audio", { detail: { action: effect.audio } }));
     if (effect.interaction) window.dispatchEvent(new CustomEvent("terminal:interaction", { detail: { action: effect.interaction } }));
@@ -68,8 +87,13 @@ export const initPlaygroundTerminal = (sections: readonly SectionManifest[]): vo
     historyIndex = Math.max(0, Math.min(history.length, historyIndex));
     input.value = history[historyIndex] ?? "";
   });
+  let initialSectionSync = true;
   window.addEventListener("section:changed", (event) => {
     const detail = (event as CustomEvent<{ id?: string }>).detail;
+    if (initialSectionSync) {
+      initialSectionSync = false;
+      return;
+    }
     filesystem.setCurrentSection(detail?.id);
     updatePrompt();
   });

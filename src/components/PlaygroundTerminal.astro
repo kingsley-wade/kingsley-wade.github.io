@@ -1,8 +1,9 @@
 ---
 import type { SectionManifest } from "../core/section-contract";
+import type { TerminalShare } from "../lib/terminal/filesystem";
 
-type Props = { sections: readonly SectionManifest[] };
-const { sections } = Astro.props;
+type Props = { sections: readonly SectionManifest[]; shares?: readonly TerminalShare[] };
+const { sections, shares = [] } = Astro.props;
 ---
 
 <section
@@ -10,6 +11,7 @@ const { sections } = Astro.props;
   aria-label="Local playground terminal"
   data-terminal
   data-sections={JSON.stringify(sections)}
+  data-shares={JSON.stringify(shares)}
 >
   <header class="playground-terminal__header">
     <span aria-hidden="true">LOCAL.SHELL</span>
@@ -39,5 +41,8 @@ const { sections } = Astro.props;
 <script>
   import { initPlaygroundTerminal } from "../lib/terminal/client";
   const terminal = document.querySelector<HTMLElement>("[data-terminal]");
-  initPlaygroundTerminal(JSON.parse(terminal?.dataset.sections ?? "[]"));
+  initPlaygroundTerminal(
+    JSON.parse(terminal?.dataset.sections ?? "[]"),
+    JSON.parse(terminal?.dataset.shares ?? "[]"),
+  );
 </script>

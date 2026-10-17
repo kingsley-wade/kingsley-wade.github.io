@@ -112,6 +112,41 @@ test("playground terminal explores sections as a local filesystem", async ({ pag
   await input.press("Enter");
   await expect(terminal).toContainText("/playground$ pwd");
 
+  const note = page.locator('[data-share-id="example-markdown-note"]');
+  const links = page.locator('[data-share-kind="link"]');
+  await expect(note).toContainText("public example");
+  await expect(links).toHaveCount(4);
+  await expect(page.locator('[data-link-card="linuxtoy-os-guide"] a'))
+    .toHaveAttribute("href", "https://i.linuxtoy.org/docs/guide/index.html");
+  await expect(page.locator('[data-share-id="external-markdown-guide"] a'))
+    .toHaveAttribute("href", "https://example.com/notes/guide.md");
+  await expect(page.locator('[data-share-id="arxiv-paper"] a'))
+    .toHaveAttribute("href", "https://arxiv.org/abs/2401.00001");
+  await expect(page.locator('[data-share-id="engineering-blog"] a'))
+    .toHaveAttribute("href", "https://example.com/blog/engineering-notes");
+
+  await input.fill("cd notes");
+  await input.press("Enter");
+  await expect(terminal).toContainText("moved to /playground/notes");
+  await expect(note).toBeVisible();
+  await expect(links.first()).toBeHidden();
+  await input.fill("open example-markdown-note");
+  await input.press("Enter");
+  await expect(note).toBeFocused();
+
+  await input.fill("cd ..");
+  await input.press("Enter");
+  await input.fill("cd links");
+  await input.press("Enter");
+  await expect(terminal).toContainText("moved to /playground/links");
+  await expect(note).toBeHidden();
+  await expect(links.first()).toBeVisible();
+  await input.fill("open linuxtoy-os-guide");
+  await input.press("Enter");
+  await expect(page.locator('[data-share-id="linuxtoy-os-guide"]')).toBeFocused();
+
+  await input.fill("cd ..");
+  await input.press("Enter");
   await input.fill("cd ..");
   await input.press("Enter");
   await input.fill("pwd");

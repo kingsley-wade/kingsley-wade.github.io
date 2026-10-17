@@ -7,6 +7,7 @@ import {
   miscSchema,
   publicationSchema,
   researchSchema,
+  sharesSchema,
 } from "./lib/content/schemas";
 
 const stableId = ({ data, entry }: { data: Record<string, unknown>; entry: string }) =>
@@ -37,4 +38,14 @@ const misc = defineCollection({
   schema: miscSchema,
 });
 
-export const collections = { about, education, research, publications, misc };
+const shares = defineCollection({
+  loader: glob({
+    pattern: "**/*.{md,mdx}",
+    base: "./src/content/shares",
+    generateId: stableId,
+    deferRender: false,
+  }),
+  schema: sharesSchema,
+});
+
+export const collections = { about, education, research, publications, misc, shares };

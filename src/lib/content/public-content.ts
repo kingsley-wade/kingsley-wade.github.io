@@ -3,6 +3,7 @@ import { getCollection, type CollectionEntry } from "astro:content";
 import type { SectionManifest } from "../../core/section-contract";
 
 import { assertNoProductionMocks } from "./mock-guard";
+import { selectPublicShares } from "./share-collection";
 
 export const getValidatedPublications = async (): Promise<
   CollectionEntry<"publications">[]
@@ -20,9 +21,17 @@ export type PublicCollectionName =
   | "education"
   | "research"
   | "publications"
-  | "misc";
+  | "misc"
+  | "shares";
 
 export type AnyPublicEntry = CollectionEntry<PublicCollectionName>;
+
+export const getValidatedShares = async (): Promise<
+  CollectionEntry<"shares">[]
+> => {
+  const entries = await getCollection("shares");
+  return selectPublicShares(entries);
+};
 
 export const getValidatedSectionEntries = async (
   section: SectionManifest,

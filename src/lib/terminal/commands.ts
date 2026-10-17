@@ -6,17 +6,19 @@ export type TerminalEffect = {
   clear?: boolean;
   navigateTo?: string;
   currentPath?: string;
+  pathChanged?: boolean;
+  focusItemId?: string;
   audio?: "guitar" | "toggle-music";
   interaction?: "fitness" | "reading";
 };
 
 export const terminalHelp = [
   "NAVIGATION",
-  "ls       list sections",
-  "cd PATH  open a section (cd .. returns home)",
+  "ls       list the current directory",
+  "cd PATH  navigate directories (cd .. moves to the parent)",
   "pwd      print the current path",
-  "open PATH  open a section",
-  "tree     show sections and their actions",
+  "open ITEM_ID  focus a playground share",
+  "tree     show sections and playground shares",
   "",
   "INTERACTIONS",
   "about    open About Me",
@@ -43,11 +45,14 @@ export const executeTerminalCommand = (
       return filesystem
         ? { lines: [filesystem.list()], currentPath: filesystem.currentPath }
         : { lines: ["filesystem unavailable"] };
-    case "cd":
+  case "cd":
+      if (!filesystem) return { lines: ["filesystem unavailable"] };
+      if (!args[0]) return { lines: ["usage: cd PATH"] };
+      return filesystem.navigate(args[0]);
     case "open":
       if (!filesystem) return { lines: ["filesystem unavailable"] };
-      if (!args[0]) return { lines: [`usage: ${command} PATH`] };
-      return filesystem.navigate(args[0]);
+      if (!args[0]) return { lines: ["usage: open ITEM_ID"] };
+      return filesystem.open(args[0]);
     case "pwd":
       return filesystem ? { lines: [filesystem.currentPath], currentPath: filesystem.currentPath } : { lines: ["/"] };
     case "tree":

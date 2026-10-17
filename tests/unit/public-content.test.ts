@@ -38,4 +38,50 @@ describe("public content serialization", () => {
       details: { period: "2026", role: "Investigator" },
     });
   });
+
+  it("publishes share kinds and keeps Link metadata in details", () => {
+    const link = {
+      id: "os-guide",
+      collection: "shares",
+      data: {
+        id: "os-guide",
+        title: "OS guide",
+        summary: "A useful guide.",
+        kind: "link",
+        source: "LinuxToy",
+        sourceUrl: "https://i.linuxtoy.org/docs/guide/index.html",
+        order: 1,
+        links: [],
+        tags: ["os"],
+        visibility: "public",
+        updatedAt: "2026-10-04",
+      },
+    } as SerializablePublicEntry;
+    const note = {
+      id: "local-note",
+      collection: "shares",
+      data: {
+        id: "local-note",
+        title: "Local note",
+        kind: "note",
+        order: 2,
+        links: [],
+        tags: [],
+        visibility: "public",
+        updatedAt: "2026-10-04",
+      },
+      rendered: { html: "<p>Markdown body</p>" },
+    } as SerializablePublicEntry;
+
+    expect(toPublicContentItem("playground", link).details).toEqual({
+      kind: "link",
+      source: "LinuxToy",
+      sourceUrl: "https://i.linuxtoy.org/docs/guide/index.html",
+    });
+    expect(toPublicContentItem("playground", note)).toMatchObject({
+      section: "playground",
+      bodyHtml: "<p>Markdown body</p>",
+      details: { kind: "note" },
+    });
+  });
 });

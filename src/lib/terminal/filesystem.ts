@@ -5,81 +5,175 @@ export type TerminalDirectory = Pick<
   "id" | "label" | "shortLabel" | "terminalCommands" | "terminalAliases"
 >;
 
+export type TerminalShare = {
+  id: string;
+  kind: "note" | "link";
+  title: string;
+};
+
 export type FilesystemEffect = {
   lines: string[];
   currentPath: string;
   navigateTo?: string;
+  pathChanged?: boolean;
+  focusItemId?: string;
 };
 
-const pathToken = (value: string): string => value.trim().toLowerCase().replace(/^\/+|\/+$/g, "");
+const normalizeSegments = (value: string): string[] =>
+  value
+    .trim()
+    .toLowerCase()
+    .split("/")
+    .filter((segment) => segment && segment !== ".");
 
-export const createTerminalFilesystem = (sections: readonly SectionManifest[]) => {
+export const createTerminalFilesystem = (
+  sections: readonly SectionManifest[],
+  shares: readonly TerminalShare[] = [],
+) => {
   const directories = sections.filter((section) => section.visibility === "public");
-  const byToken = new Map<string, SectionManifest>();
-  for (const section of directories) {
-    for (const token of [section.id, section.label, section.shortLabel, ...(section.terminalAliases ?? [])]) {
-      if (token) byToken.set(pathToken(token.replaceAll("/", "-")), section);
-    }
-  }
+  const sectionById = new Map(directories.map((section) => [section.id, section]));
+  const sectionAlias = new Map(
+    directories.flatMap((section) => (section.terminalAliases ?? []).map((alias) => [alias, section.id] as const)),
+  );
+  const shareById = new Map(shares.map((share) => [share.id, share]));
+  let path: string[] = [];
 
-  let currentPath = "/";
-  const sectionForPath = () => (currentPath === "/" ? undefined : byToken.get(currentPath.slice(1)));
-  const available = () => directories.map((section) => section.id).join("  ");
-  const list = () => {
-    const active = sectionForPath()?.id;
-    return directories.map((section) => `${section.id}/${section.id === active ? "  *" : ""}`.trimEnd()).join("  ");
+  const pathString = () => `/${path.join("/")}`;
+  const category = () =>
+    path[0] === "playground" && (path[1] === "notes" || path[1] === "links")
+      ? path[1]
+      : undefined;
+  const sharesForCategory = (kind: TerminalShare["kind"]) =>
+    shares.filter((share) => share.kind === kind);
+  const availableAt = (segments: string[]) => {
+    if (segments.length === 0) return directories.map((section) => `${section.id}/`).join("  ");
+    if (segments.length === 1 && segments[0] === "playground") {
+      return `${directories.map(({ id }) => `${id}/`).join("  ")}  notes/  links/`;
+    }
+    if (segments.length === 2 && segments[0] === "playground") {
+      const kind = segments[1] === "notes" ? "note" : "link";
+      return sharesForCategory(kind).map((share) => share.id).join("  ") || "(empty)";
+    }
+    return "";
   };
-  const resolve = (raw: string) => {
-    const token = pathToken(raw);
-    if (!token || token === ".") return sectionForPath();
-    if (token === ".." || token === "/") return undefined;
-    return byToken.get(token.replaceAll("/", "-"));
+  const list = () => {
+    const currentCategory = category();
+    if (currentCategory) {
+      const kind = currentCategory === "notes" ? "note" : "link";
+      return sharesForCategory(kind).map((share) => `${share.id}/`).join("  ") || "(empty)";
+    }
+    if (path.length === 1 && path[0] === "playground") {
+      return `${directories.map(({ id }) => `${id}/`).join("  ")}  notes/  links/`;
+    }
+    const active = path[0];
+    return directories
+      .map((section) => `${section.id}/${section.id === active ? "  *" : ""}`.trimEnd())
+      .join("  ");
+  };
+  const resolveTarget = (raw: string): string[] | undefined => {
+    const absolute = raw.trim().startsWith("/");
+    const normalized = normalizeSegments(raw);
+    const directSection = normalized.length === 1 &&
+      (sectionById.has(normalized[0]) || sectionAlias.has(normalized[0]));
+    const target = absolute || (path[0] === "playground" && path.length === 1 && directSection)
+      ? []
+      : [...path];
+    for (const segment of normalized) {
+      if (segment === "..") {
+        target.pop();
+        continue;
+      }
+      target.push(segment);
+    }
+    if (target.length === 0) return target;
+    if (!sectionById.has(target[0])) {
+      const aliasTarget = sectionAlias.get(target[0]);
+      if (!aliasTarget) return undefined;
+      target[0] = aliasTarget;
+    }
+    if (target.length === 1) return target;
+    if (target[0] !== "playground" || !["notes", "links"].includes(target[1])) return undefined;
+    if (target.length === 2) return target;
+    if (target.length === 3) {
+      const share = shareById.get(target[2]);
+      const kind = target[1] === "notes" ? "note" : "link";
+      return share?.kind === kind ? target : undefined;
+    }
+    return undefined;
   };
 
   return {
     get currentPath() {
-      return currentPath;
+      return pathString();
     },
     setCurrentSection(id: string | undefined) {
-      const section = id ? byToken.get(pathToken(id)) : undefined;
-      currentPath = section ? `/${section.id}` : "/";
+      path = id && sectionById.has(id) ? [id] : [];
     },
     directories: directories as readonly TerminalDirectory[],
     completions(prefix: string) {
-      const normalized = pathToken(prefix);
-      return directories
-        .flatMap((section) => [section.id, ...(section.terminalAliases ?? [])])
-        .filter((token) => token.startsWith(normalized));
+      const currentCategory = category();
+      const kind = currentCategory === "notes" ? "note" : currentCategory === "links" ? "link" : undefined;
+      const tokens = kind
+        ? sharesForCategory(kind).map((share) => share.id)
+        : path[0] === "playground"
+          ? ["notes", "links"]
+          : directories.flatMap((section) => [section.id, ...(section.terminalAliases ?? [])]);
+      const normalized = prefix.trim().toLowerCase().replace(/^\/+/, "");
+      return tokens.filter((token) => token.startsWith(normalized));
     },
     list,
-    available,
-    resolve,
+    available() {
+      return availableAt(path);
+    },
     navigate(raw: string): FilesystemEffect {
-      const token = pathToken(raw);
-      if (token === ".." || token === "/") {
-        currentPath = "/";
-        return { lines: ["moved to /"], currentPath };
-      }
-      const section = resolve(raw);
-      if (!section) {
+      const target = resolveTarget(raw);
+      if (!target) {
         return {
-          lines: [`path not found: ${raw}`, `available: ${available()}`],
-          currentPath,
+          lines: [`path not found: ${raw}`, `available: ${availableAt(path)}`],
+          currentPath: pathString(),
         };
       }
-      currentPath = `/${section.id}`;
+      path = target;
+      const sectionId = target[0];
+      const pathChanged = true;
       return {
-        lines: [`opened ${currentPath}`, section.label],
-        currentPath,
-        navigateTo: section.id,
+        lines: [`moved to ${pathString()}`],
+        currentPath: pathString(),
+        ...(target.length === 1 && sectionId ? { navigateTo: sectionId } : {}),
+        pathChanged,
+      };
+    },
+    open(raw: string): FilesystemEffect {
+      const id = raw.trim().toLowerCase();
+      const kind = category() === "notes" ? "note" : category() === "links" ? "link" : undefined;
+      const share = shareById.get(id);
+      if (!kind || !share || share.kind !== kind) {
+        return {
+          lines: [`item not found: ${raw}`, `available: ${availableAt(path)}`],
+          currentPath: pathString(),
+        };
+      }
+      return {
+        lines: [`opening ${share.id}: ${share.title}`],
+        currentPath: pathString(),
+        focusItemId: share.id,
       };
     },
     tree(): string[] {
       return [
         "/",
         ...directories.map((section) => {
-          const commands = section.terminalCommands?.join(", ") || "section content";
-          return `|- ${section.id}/  [${commands}]`;
+          if (section.id !== "playground") {
+            const commands = section.terminalCommands?.join(", ") || "section content";
+            return `|- ${section.id}/  [${commands}]`;
+          }
+          return [
+            "|- playground/",
+            ...(["notes", "links"] as const).map((name) => {
+              const kind = name === "notes" ? "note" : "link";
+              return `|  |- ${name}/  [${sharesForCategory(kind).map(({ id }) => id).join(", ") || "empty"}]`;
+            }),
+          ].join("\n");
         }),
       ];
     },

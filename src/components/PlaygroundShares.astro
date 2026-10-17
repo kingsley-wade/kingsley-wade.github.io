@@ -1,0 +1,65 @@
+---
+import { render, type CollectionEntry } from "astro:content";
+import { toShareLinkCard } from "../lib/content/share-view";
+
+type Props = { entries: CollectionEntry<"shares">[] };
+const { entries } = Astro.props;
+const renderedEntries = await Promise.all(
+  entries.map(async (entry) => ({
+    entry,
+    Content: entry.data.kind === "note" ? (await render(entry)).Content : null,
+  })),
+);
+---
+
+<div class="playground-shares" data-playground-shares>
+  {renderedEntries.map(({ entry, Content }) => {
+    const data = entry.data;
+    return (
+      <article
+        class="content-entry playground-share"
+        id={entry.id}
+        data-share-id={entry.id}
+        data-share-kind={data.kind}
+        tabindex="-1"
+      >
+        <header>
+          <p class="content-entry__period">{data.kind === "note" ? "NOTE" : "LINK"}</p>
+          <h3>{data.title}</h3>
+          <p class="content-entry__updated">Updated {data.updatedAt}</p>
+        </header>
+        {data.summary ? <p>{data.summary}</p> : null}
+        {data.tags.length > 0 ? <p class="content-entry__tags">{data.tags.join(" / ")}</p> : null}
+        {data.kind === "link" ? (
+          (() => {
+            const card = toShareLinkCard(data);
+            return (
+              <p class="playground-share__source" data-link-card={card.id}>
+                {card.source ? <span>{card.source}: </span> : null}
+                <a href={card.href} target="_blank" rel="noreferrer">Open source</a>
+              </p>
+            );
+          })()
+        ) : Content ? (
+          <div class="playground-share__body"><Content /></div>
+        ) : null}
+      </article>
+    );
+  })}
+</div>
+
+<script>
+  const container = document.querySelector<HTMLElement>("[data-playground-shares]");
+  const applyPath = (path: string) => {
+    if (!container) return;
+    const kind = path === "/playground/notes" ? "note" : path === "/playground/links" ? "link" : null;
+    container.querySelectorAll<HTMLElement>("[data-share-kind]").forEach((item) => {
+      item.hidden = kind !== null && item.dataset.shareKind !== kind;
+    });
+  };
+  applyPath("/playground");
+  window.addEventListener("terminal:path-changed", (event) => {
+    const path = (event as CustomEvent<{ path?: string }>).detail?.path ?? "/playground";
+    applyPath(path);
+  });
+</script>

@@ -14,6 +14,58 @@ that ID stable even when renaming the file or changing its title.
   `tests/fixtures/` and production rejects `mock: true`.
 - `misc/*.md`: Life and Playground entries selected by `sectionId`.
 
+## Playground shares
+
+Playground shares are independent from the existing `misc` entries:
+
+- `src/content/shares/notes/*.md` stores owner-authored Markdown Notes.
+- `src/content/shares/links/*.md` stores public Links as summary cards.
+
+Both types are public by default. Add `visibility: hidden` while drafting to
+exclude an entry from the page and `/api/v1/content.json`. A pushed Note is
+public content, so do not use this collection for private material.
+
+Note example:
+
+```md
+---
+id: terminal-notes
+title: Terminal notes
+kind: note
+summary: A short field note.
+order: 10
+updatedAt: 2026-10-04
+tags: [systems]
+---
+
+The Markdown body is rendered locally in Playground.
+```
+
+Link example:
+
+```md
+---
+id: os-guide
+title: Operating systems guide
+kind: link
+summary: A guide I want to revisit.
+source: LinuxToy
+sourceUrl: https://i.linuxtoy.org/docs/guide/index.html
+order: 20
+updatedAt: 2026-10-04
+tags: [os]
+---
+```
+
+External Markdown files, arXiv records, documentation pages, and blog posts
+are all Links. The site preserves the URL and shows a summary card; it does
+not fetch or embed remote content. The visitor activates the external anchor.
+
+The current `Example ...` entries under `src/content/shares/` are intentionally
+public preview content so the Note body and all four Link URL formats are
+visible while checking the interface. Remove or replace those entries when
+adding your own curated shares.
+
 Set `visibility: hidden` to keep a draft out of the page and public JSON. Never
 place private notes, credentials, raw CV files, or source photographs in a
 content collection.

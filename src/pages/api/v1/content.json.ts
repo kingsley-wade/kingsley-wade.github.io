@@ -4,6 +4,7 @@ import { siteConfig } from "../../../config/site";
 import { sectionRegistry } from "../../../core/section-registry";
 import {
   getValidatedSectionEntries,
+  getValidatedShares,
   toPublicContentItem,
 } from "../../../lib/content/public-content";
 
@@ -13,11 +14,21 @@ export const GET: APIRoute = async () => {
   const sections = await Promise.all(
     sectionRegistry.map(async (section, index) => {
       const entries = await getValidatedSectionEntries(section);
+      const sectionEntries = section.id === "playground"
+        ? await getValidatedShares()
+        : [];
+      const renderedShareEntries = sectionEntries.map((entry) => {
+        const rendered = (entry as typeof entry & { rendered?: { html: string } }).rendered;
+        return toPublicContentItem(section.id, { ...entry, rendered });
+      });
       return {
         id: section.id,
         label: section.label,
         order: index + 1,
-        items: entries.map((entry) => toPublicContentItem(section.id, entry)),
+        items: [
+          ...entries.map((entry) => toPublicContentItem(section.id, entry)),
+          ...renderedShareEntries,
+        ],
       };
     }),
   );

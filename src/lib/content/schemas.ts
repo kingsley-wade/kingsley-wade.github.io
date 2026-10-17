@@ -69,4 +69,38 @@ export const miscSchema = publicEntryBase.extend({
   order: z.number().int().nonnegative(),
 });
 
+const shareEntryBase = z.object({
+  id: stableIdSchema,
+  title: z.string().min(1),
+  summary: z.string().min(1).optional(),
+  links: z.array(publicLinkSchema).default([]),
+  tags: z.array(z.string().min(1)).default([]),
+  visibility: visibilitySchema.default("public"),
+  updatedAt: z.iso.date(),
+  order: z.number().int().nonnegative(),
+});
+
+const shareNoteSchema = shareEntryBase.extend({
+  kind: z.literal("note"),
+});
+
+const shareLinkSchema = shareEntryBase.extend({
+  kind: z.literal("link"),
+  summary: z.string().min(1),
+  source: z.string().min(1).optional(),
+  sourceUrl: z.url().refine(
+    (value) => {
+      const protocol = new URL(value).protocol;
+      return protocol === "http:" || protocol === "https:";
+    },
+    "Use an absolute HTTP or HTTPS URL",
+  ),
+});
+
+export const sharesSchema = z.discriminatedUnion("kind", [
+  shareNoteSchema,
+  shareLinkSchema,
+]);
+
 export type PublicationData = z.infer<typeof publicationSchema>;
+export type ShareData = z.infer<typeof sharesSchema>;

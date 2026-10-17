@@ -29,6 +29,9 @@ export const initPlaygroundTerminal = (
     while (output.children.length > 50) output.firstElementChild?.remove();
     output.scrollTop = output.scrollHeight;
   };
+  const dispatchPathChanged = (path: string) => {
+    window.dispatchEvent(new CustomEvent("terminal:path-changed", { detail: { path } }));
+  };
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const raw = input.value;
@@ -47,13 +50,7 @@ export const initPlaygroundTerminal = (
     if (effect.clear) output.replaceChildren();
     for (const line of effect.lines) appendLine(line, parsed.command === "help" ? "help" : "output");
     if (effect.currentPath) updatePrompt();
-    if (effect.pathChanged) {
-      window.dispatchEvent(
-        new CustomEvent("terminal:path-changed", {
-          detail: { path: effect.currentPath },
-        }),
-      );
-    }
+    if (effect.pathChanged) dispatchPathChanged(effect.currentPath);
     if (status) status.textContent = effect.navigateTo ? "OPEN" : "READY";
     if (effect.navigateTo) {
       document.querySelector<HTMLAnchorElement>(`[data-section-link="${CSS.escape(effect.navigateTo)}"]`)?.click();
@@ -96,5 +93,6 @@ export const initPlaygroundTerminal = (
     }
     filesystem.setCurrentSection(detail?.id);
     updatePrompt();
+    dispatchPathChanged(filesystem.currentPath);
   });
 };

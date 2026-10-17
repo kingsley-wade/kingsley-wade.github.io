@@ -152,4 +152,12 @@ test("playground terminal explores sections as a local filesystem", async ({ pag
   await input.fill("pwd");
   await input.press("Enter");
   await expect(terminal).toContainText("guest@local:/$ pwd");
+
+  await input.fill("cd playground/notes");
+  await input.press("Enter");
+  await expect(links.first()).toBeHidden();
+  await page.getByRole("link", { name: /Education/ }).click();
+  await page.getByRole("link", { name: /Playground/ }).click();
+  await expect(note).toBeVisible();
+  await expect(links.first()).toBeVisible();
 });

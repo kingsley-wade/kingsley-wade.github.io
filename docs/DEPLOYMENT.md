@@ -39,10 +39,9 @@ tree.
 ## GitHub Pages deployment
 
 The personal site keeps the existing root URL at
-`https://kingsley-wade.github.io/`. Pushes to `master` run
-`.github/workflows/deploy-pages.yml`; pull request builds validate without
-publishing. The workflow uploads only `dist/` and publishes it with GitHub's
-Pages deployment action.
+`https://kingsley-wade.github.io/`. Pushes to `master` and manual workflow
+dispatches run `.github/workflows/deploy-pages.yml`. The workflow uploads
+only `dist/` and publishes it with GitHub's Pages deployment action.
 
 Local setup and preview:
 

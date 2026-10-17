@@ -46,15 +46,17 @@ export const createTerminalFilesystem = (
   const sharesForCategory = (kind: TerminalShare["kind"]) =>
     shares.filter((share) => share.kind === kind);
   const availableAt = (segments: string[]) => {
-    if (segments.length === 0) return directories.map((section) => `${section.id}/`).join("  ");
+    if (segments.length >= 2 && segments[0] === "playground") {
+      if (segments.length === 2) {
+        const kind = segments[1] === "notes" ? "note" : "link";
+        return sharesForCategory(kind).map((share) => share.id).join("  ") || "(empty)";
+      }
+      return segments[2] ?? "";
+    }
     if (segments.length === 1 && segments[0] === "playground") {
       return `${directories.map(({ id }) => `${id}/`).join("  ")}  notes/  links/`;
     }
-    if (segments.length === 2 && segments[0] === "playground") {
-      const kind = segments[1] === "notes" ? "note" : "link";
-      return sharesForCategory(kind).map((share) => share.id).join("  ") || "(empty)";
-    }
-    return "";
+    return directories.map((section) => `${section.id}/`).join("  ");
   };
   const list = () => {
     const currentCategory = category();
@@ -72,17 +74,15 @@ export const createTerminalFilesystem = (
   };
   const resolveTarget = (raw: string): string[] | undefined => {
     const absolute = raw.trim().startsWith("/");
-    const normalized = normalizeSegments(raw);
-    const directSection = normalized.length === 1 &&
-      (sectionById.has(normalized[0]) || sectionAlias.has(normalized[0]));
-    const target = absolute || (path[0] === "playground" && path.length === 1 && directSection)
-      ? []
-      : [...path];
-    for (const segment of normalized) {
+    const target: string[] = absolute ? [] : [...path];
+    for (const segment of normalizeSegments(raw)) {
       if (segment === "..") {
         target.pop();
         continue;
       }
+      // Section names are top-level directories; entering one from a nested
+      // playground path starts over from the root instead of failing.
+      if (sectionById.has(segment) || sectionAlias.has(segment)) target.length = 0;
       target.push(segment);
     }
     if (target.length === 0) return target;

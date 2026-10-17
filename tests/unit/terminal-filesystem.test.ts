@@ -84,4 +84,19 @@ describe("terminal filesystem", () => {
     expect(filesystem.navigate("missing").lines[0]).toBe("path not found: missing");
     expect(filesystem.navigate("..").currentPath).toBe("/playground");
   });
+
+  it("navigates from nested playground paths back into sections", () => {
+    const filesystem = createTerminalFilesystem(sections, shares);
+    filesystem.navigate("/playground/notes");
+    expect(filesystem.navigate("../about")).toMatchObject({
+      currentPath: "/about",
+      navigateTo: "about",
+    });
+    filesystem.navigate("/playground/notes");
+    expect(filesystem.navigate("research")).toMatchObject({
+      currentPath: "/research",
+      navigateTo: "research",
+    });
+    expect(filesystem.available()).toBe("about/  research/  playground/");
+  });
 });

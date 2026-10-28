@@ -50,7 +50,7 @@ export const initPlaygroundTerminal = (
     if (effect.clear) output.replaceChildren();
     for (const line of effect.lines) appendLine(line, parsed.command === "help" ? "help" : "output");
     if (effect.currentPath) updatePrompt();
-    if (effect.pathChanged) dispatchPathChanged(effect.currentPath);
+    if (effect.pathChanged && effect.currentPath) dispatchPathChanged(effect.currentPath);
     if (status) status.textContent = effect.navigateTo ? "OPEN" : "READY";
     if (effect.navigateTo) {
       document.querySelector<HTMLAnchorElement>(`[data-section-link="${CSS.escape(effect.navigateTo)}"]`)?.click();

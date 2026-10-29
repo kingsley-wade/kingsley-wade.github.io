@@ -10,7 +10,7 @@ export default defineSection({
   contentCollection: "misc",
   renderer: "playground",
   audioScale: "e-blues",
-  terminalCommands: ["help", "guitar", "music", "clear"],
+  terminalCommands: ["help", "guitar", "music", "arcade", "clear"],
   terminalAliases: ["play"],
   visibility: "public",
 });

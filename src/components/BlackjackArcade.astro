@@ -1,0 +1,28 @@
+<section class="playground-block blackjack" aria-labelledby="blackjack-title" data-blackjack>
+  <header class="playground-block__header">
+    <p class="playground-block__eyebrow">ARCADE 01 / DEALER'S CHASE</p>
+    <h3 id="blackjack-title">21 · Dealer’s Chase</h3>
+    <p>Your goal is 21. Hit or stand, then the dealer chases your total: after you stand, they draw until they catch you or go bust. Ties push. No stakes, just one more hand.</p>
+  </header>
+  <div class="blackjack__table">
+    <section class="blackjack__hand" aria-labelledby="blackjack-dealer-label">
+      <div class="blackjack__hand-heading"><h4 id="blackjack-dealer-label">Dealer</h4><output data-blackjack-dealer-total aria-label="Dealer total">—</output></div>
+      <ul class="blackjack__cards" data-blackjack-dealer-cards aria-label="Dealer cards"></ul>
+    </section>
+    <div class="blackjack__divider" aria-hidden="true"><span>VS</span></div>
+    <section class="blackjack__hand" aria-labelledby="blackjack-player-label">
+      <div class="blackjack__hand-heading"><h4 id="blackjack-player-label">You</h4><output data-blackjack-player-total aria-label="Your total">—</output></div>
+      <ul class="blackjack__cards" data-blackjack-player-cards aria-label="Your cards"></ul>
+    </section>
+  </div>
+  <div class="blackjack__controls" role="group" aria-label="Game controls">
+    <button type="button" data-blackjack-deal>Deal a hand</button>
+    <button type="button" data-blackjack-hit disabled>Hit</button>
+    <button type="button" data-blackjack-stand disabled>Stand</button>
+  </div>
+  <p class="blackjack__status" data-blackjack-status role="status" aria-live="polite">Ready when you are. Deal a hand to begin.</p>
+</section>
+<script>
+  import { initBlackjackArcade } from "../lib/playground/blackjack-client";
+  document.querySelectorAll<HTMLElement>("[data-blackjack]").forEach((root) => initBlackjackArcade(root));
+</script>

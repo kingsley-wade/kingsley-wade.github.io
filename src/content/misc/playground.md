@@ -1,7 +1,7 @@
 ---
 id: local-playground
 title: Local Playground
-summary: Small browser experiments connected to music, books, training, and the site itself.
+summary: A local corner for visual experiments, quick arcade rounds, and reading links.
 sectionId: playground
 order: 10
 links: []
@@ -13,6 +13,6 @@ visibility: public
 updatedAt: "2026-09-28"
 ---
 
-The playground keeps its experiments local and bounded. The future assistant
-status will remain offline until an authenticated private-notes service is
-configured.
+The Lab explores how simple reaction rules can grow intricate patterns. In the
+Arcade, try to reach 21 before the dealer chases your total. These experiments
+run in your browser and do not save scores or settings.

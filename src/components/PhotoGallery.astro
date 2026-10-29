@@ -1,0 +1,46 @@
+---
+import { withBase } from "../config/site";
+import { photos } from "../content/photos/gallery";
+
+const gallery = photos.map((photo) => ({
+  ...photo,
+  src: withBase(photo.src),
+}));
+---
+
+<section class="photo-gallery" aria-label="Photo gallery" data-photo-gallery>
+  {gallery.length > 0 ? (
+    <div class="photo-gallery__grid">
+      {gallery.map((photo) => (
+        <button
+          class="photo-gallery__tile"
+          type="button"
+          data-photo-open={photo.id}
+          aria-haspopup="dialog"
+        >
+          <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" />
+        </button>
+      ))}
+    </div>
+  ) : (
+    <p class="photo-gallery__empty">
+      Add a photo under <code>public/images/photos/</code>, then register its path and alt text in
+      <code>src/content/photos/gallery.ts</code>.
+    </p>
+  )}
+
+  <dialog class="photo-gallery__dialog" data-photo-dialog aria-label="Photo viewer">
+    <button class="photo-gallery__close" type="button" data-photo-close aria-label="Close photo viewer">
+      Close
+    </button>
+    <img data-photo-dialog-image alt="" />
+  </dialog>
+</section>
+
+<script>
+  import { initPhotoGallery } from "../lib/photos/photo-gallery-client";
+
+  document.querySelectorAll<HTMLElement>("[data-photo-gallery]").forEach((root) => {
+    initPhotoGallery(root);
+  });
+</script>

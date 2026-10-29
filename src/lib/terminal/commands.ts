@@ -9,7 +9,7 @@ export type TerminalEffect = {
   pathChanged?: boolean;
   focusItemId?: string;
   audio?: "guitar" | "toggle-music";
-  interaction?: "fitness" | "reading";
+  interaction?: "fitness" | "reading" | "arcade";
 };
 
 export const terminalHelp = [
@@ -26,6 +26,7 @@ export const terminalHelp = [
   "guitar   play one scale note",
   "fitness  trigger a training break",
   "music    toggle the background track",
+  "arcade   start the Playground side quest",
   "status   show the current section",
   "",
   "UTILITIES",
@@ -77,6 +78,11 @@ export const executeTerminalCommand = (
       };
     case "music":
       return { lines: ["toggling background track"], audio: "toggle-music" };
+    case "arcade":
+      return {
+        lines: ["side quest unlocked: 21 · Dealer's Chase"],
+        interaction: "arcade",
+      };
     case "clear":
       return { lines: [], clear: true };
   }

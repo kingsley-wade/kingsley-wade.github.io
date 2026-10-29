@@ -10,6 +10,7 @@ export const rendererIds = [
   "publications",
   "life",
   "playground",
+  "photos",
 ] as const;
 export type RendererId = (typeof rendererIds)[number];
 
@@ -36,6 +37,7 @@ export const terminalCommandIds = [
   "guitar",
   "fitness",
   "music",
+  "arcade",
   "clear",
 ] as const;
 export type TerminalCommandId = (typeof terminalCommandIds)[number];

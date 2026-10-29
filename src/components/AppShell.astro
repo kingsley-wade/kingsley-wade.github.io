@@ -1,6 +1,7 @@
 ---
 import { render, type CollectionEntry } from "astro:content";
 
+import { siteConfig } from "../config/site";
 import type { SectionManifest } from "../core/section-contract";
 import { getValidatedSectionEntries } from "../lib/content/public-content";
 import { getValidatedShares } from "../lib/content/public-content";
@@ -12,6 +13,9 @@ import PlaygroundTerminal from "./PlaygroundTerminal.astro";
 import TerminalIdentity from "./TerminalIdentity.astro";
 import TerminalMenu from "./TerminalMenu.astro";
 import PlaygroundShares from "./PlaygroundShares.astro";
+import ReactionDiffusionLab from "./ReactionDiffusionLab.astro";
+import BlackjackArcade from "./BlackjackArcade.astro";
+import PhotoGallery from "./PhotoGallery.astro";
 
 type Props = {
   sections: readonly SectionManifest[];
@@ -49,7 +53,7 @@ await Promise.all(
 <main id="main-content" class="app-shell">
   <TerminalIdentity />
   <AudioControls />
-  <AssistantStatus />
+  {siteConfig.features.assistantStatus ? <AssistantStatus /> : null}
   <div class="app-shell__workspace">
     <TerminalMenu sections={sections} />
     <div class="app-shell__content" aria-live="polite">
@@ -68,9 +72,15 @@ await Promise.all(
                           {"period" in data && data.period ? (
                             <p class="content-entry__period">{data.period}</p>
                           ) : null}
+                          {"year" in data && data.year ? (
+                            <p class="content-entry__period">{data.year}</p>
+                          ) : null}
                           <h3>{data.title}</h3>
                           {"institution" in data && data.institution ? (
                             <p class="content-entry__institution">{data.institution}</p>
+                          ) : null}
+                          {"venue" in data && data.venue ? (
+                            <p class="content-entry__institution">{data.venue}</p>
                           ) : null}
                         {"role" in data && data.role ? (
                             <p class="content-entry__role">{data.role}</p>
@@ -99,14 +109,17 @@ await Promise.all(
                     );
                   })}
                 </div>
-              ) : (
+              ) : section.renderer === "photos" ? null : (
                 <p class="content-panel__empty">
                   {section.emptyState ?? "This section is being prepared."}
                 </p>
               )}
+              {section.renderer === "photos" ? <PhotoGallery /> : null}
               {section.renderer === "life" ? <InterestInteractions /> : null}
               {section.renderer === "playground" ? (
                 <>
+                  <ReactionDiffusionLab />
+                  <BlackjackArcade />
                   <PlaygroundShares entries={shares} />
                   <PlaygroundTerminal
                     sections={sections}

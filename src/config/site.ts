@@ -37,7 +37,7 @@ export const siteConfig: SiteConfig = {
     displayName: "Manting Guo",
     handle: "kingsley-wade",
     affiliation: "Shanghai Jiao Tong University",
-    focus: "Applied Mathematics / Agent Systems",
+    focus: "AI & Applied Mathematics",
   },
   metadata: {
     title: "Manting Guo | Personal Homepage",
@@ -58,7 +58,7 @@ export const siteConfig: SiteConfig = {
   ],
   features: {
     audio: true,
-    assistantStatus: true,
+    assistantStatus: false,
     playgroundTerminal: true,
   },
   assistantBaseUrl: normalizeOptionalUrl(

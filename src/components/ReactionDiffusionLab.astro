@@ -1,0 +1,67 @@
+---
+import { grayScottPresets } from "../lib/playground/gray-scott";
+---
+
+<section class="playground-block reaction-lab" aria-labelledby="reaction-lab-title" data-reaction-diffusion-lab>
+  <header class="playground-block__header">
+    <p class="playground-block__eyebrow">LAB 01 / PATTERN ENGINE</p>
+    <h3 id="reaction-lab-title">Reaction–Diffusion Lab</h3>
+    <p>
+      Two simple reactions can grow surprisingly intricate patterns. Adjust the feed and kill
+      rates, then watch the surface reorganize.
+    </p>
+  </header>
+
+  <div class="reaction-lab__workspace">
+    <div class="reaction-lab__canvas-frame">
+      <canvas
+        data-reaction-canvas
+        width="128"
+        height="96"
+        role="img"
+        aria-label="Live reaction-diffusion pattern. Use the labeled controls to change the simulation."
+        aria-describedby="reaction-lab-description"
+      ></canvas>
+    </div>
+    <div class="reaction-lab__controls">
+      <label>
+        Preset
+        <select data-reaction-preset>
+          {grayScottPresets.map((preset) => (
+            <option value={preset.id} data-preset-feed={preset.feed} data-preset-kill={preset.kill}>
+              {preset.label}
+            </option>
+          ))}
+          <option value="custom" disabled>Custom</option>
+        </select>
+      </label>
+      <label>
+        Feed <output data-feed-value>{grayScottPresets[0].feed.toFixed(3)}</output>
+        <input data-feed type="range" min="0.010" max="0.080" step="0.001" value={grayScottPresets[0].feed} />
+      </label>
+      <label>
+        Kill <output data-kill-value>{grayScottPresets[0].kill.toFixed(3)}</output>
+        <input data-kill type="range" min="0.045" max="0.070" step="0.001" value={grayScottPresets[0].kill} />
+      </label>
+      <div class="reaction-lab__actions">
+        <button type="button" data-reaction-toggle aria-pressed="false">Run simulation</button>
+        <button type="button" data-reaction-reset>Reset pattern</button>
+      </div>
+      <p id="reaction-lab-description" class="reaction-lab__status" data-reaction-status aria-live="polite">
+        Ready · choose a preset or adjust the parameters.
+      </p>
+    </div>
+  </div>
+
+  <p class="reaction-lab__research-link">
+    <a href="#research" data-section-link="research">Related work: Reaction-Diffusion Systems</a>
+  </p>
+</section>
+
+<script>
+  import { initReactionDiffusionLab } from "../lib/playground/reaction-diffusion-client";
+
+  document.querySelectorAll<HTMLElement>("[data-reaction-diffusion-lab]").forEach((root) => {
+    initReactionDiffusionLab(root);
+  });
+</script>

@@ -16,9 +16,12 @@ visibility: public
 updatedAt: "2026-09-28"
 ---
 
-I study applied mathematics at Shanghai Jiao Tong University. My current
-interests center on optimization and infrastructure for AI-agent workflows.
+AI + X, and X + AI: I use ideas from applied mathematics to make AI systems
+work better, and I’m curious how AI can return the favor in science and
+engineering.
 
-More broadly, I enjoy mathematically grounded problems whose effects can be
-observed in real systems, from biological pattern formation and scientific
-computing to AI-driven decision making.
+My current research focuses on optimization and infrastructure for AI-agent
+workflows, including scheduling and reliable execution. I also work on
+mathematical modeling and numerical analysis of biological systems. I’m open
+to research collaborations and internship opportunities in applied
+mathematics, AI systems, and research engineering.

@@ -341,28 +341,11 @@ button:active {
 
 .audio-controls {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-3) var(--space-6);
+  gap: var(--space-2) var(--space-6);
   align-items: center;
   padding: var(--space-4);
   border-block-end: var(--line-pixel) solid var(--color-terminal-border);
   background: var(--color-surface-mint);
-}
-
-.audio-controls__track {
-  display: grid;
-  min-width: 0;
-  font-size: 0.82rem;
-}
-
-.audio-controls__track strong,
-.audio-controls__track span {
-  overflow-wrap: anywhere;
-}
-
-.audio-controls__label {
-  color: var(--color-link);
-  font: 400 0.55rem/1.8 "Press Start 2P", monospace;
 }
 
 .audio-controls__actions {
@@ -1068,10 +1051,6 @@ button:active {
   }
 
   .app-shell__workspace {
-    grid-template-columns: 1fr;
-  }
-
-  .audio-controls {
     grid-template-columns: 1fr;
   }
 

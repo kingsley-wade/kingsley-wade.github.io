@@ -13,7 +13,6 @@ test("sound preference controls the persistent background track", async ({
   await page.getByRole("button", { name: "ENTER MUTED" }).click();
 
   const player = page.locator("[data-audio-controls]");
-  await expect(player.locator("[data-audio-title]")).not.toHaveText("");
   await expect(player.locator("[data-audio-status]")).toContainText("Paused");
 
   await page.getByRole("button", { name: "Unmute background music" }).click();

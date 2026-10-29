@@ -30,7 +30,7 @@ try {
   const missingItems = expectedItems.filter((id) => !html.includes(`id="${id}"`));
   if (missingItems.length) fail(`content IDs missing from HTML: ${missingItems.join(", ")}`);
   if (api.schemaVersion !== "1.0") fail(`unexpected API schema ${api.schemaVersion}`);
-  if (api.sections.length !== 6) fail(`expected 6 sections, found ${api.sections.length}`);
+  if (api.sections.length !== 7) fail(`expected 7 sections, found ${api.sections.length}`);
 
   const assets = [...html.matchAll(/(?:src|href)="([^"]+)"/g)]
     .map(([, value]) => value)

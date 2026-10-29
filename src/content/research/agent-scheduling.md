@@ -6,7 +6,7 @@ period: 2025-Present
 role: Current working papers
 order: 40
 links:
-  - label: OpenReview record listed in the CV
+  - label: OpenReview
     url: https://openreview.net/forum?id=xpJiRqbBUk
 tags:
   - agent systems
@@ -17,5 +17,5 @@ updatedAt: "2026-09-28"
 ---
 
 Developing AgentMIP, a DAG-aware mixed-integer programming scheduler for
-cross-workflow stage batching and adapter switching. The source CV records the
-manuscript as under review at AAAI 2027.
+cross-workflow stage batching and adapter switching. The manuscript is under
+review at AAAI 2027.

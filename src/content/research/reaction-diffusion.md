@@ -6,7 +6,7 @@ period: 2023-2024
 role: Theoretical derivation, numerical simulation, and analysis
 order: 20
 links:
-  - label: Related Structure article listed in the CV
+  - label: Related article in Structure
     url: https://www.cell.com/structure/fulltext/S0969-2126(25)00216-3
 tags:
   - reaction-diffusion

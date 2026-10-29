@@ -24,13 +24,14 @@ const modules = (...manifests: SectionManifest[]) =>
   );
 
 describe("section registry", () => {
-  it("auto-discovers the six public modules in deterministic order", () => {
+  it("auto-discovers the seven public modules in deterministic order", () => {
     expect(sectionRegistry.map(({ id }) => id)).toEqual([
       "about",
       "education",
       "research",
       "publications",
       "life",
+      "photos",
       "playground",
     ]);
   });

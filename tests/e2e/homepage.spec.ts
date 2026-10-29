@@ -71,7 +71,7 @@ test("publications shows its honest empty state and misc content is available", 
   );
 });
 
-test("assistant remains offline without making a network request", async ({
+test("assistant status stays hidden without making a network request", async ({
   page,
 }) => {
   const assistantRequests: string[] = [];
@@ -86,10 +86,7 @@ test("assistant remains offline without making a network request", async ({
 
   await page.goto("/#playground");
   await page.getByRole("button", { name: "ENTER MUTED" }).click();
-  await expect(page.locator("[data-assistant-label]")).toHaveText(
-    "assistant: offline / not configured",
-  );
-  await expect(page.locator("[data-assistant-status] input")).toHaveCount(0);
+  await expect(page.locator("[data-assistant-status]")).toHaveCount(0);
   expect(assistantRequests).toEqual([]);
 });
 
@@ -116,7 +113,7 @@ test("playground terminal explores sections as a local filesystem", async ({ pag
   const links = page.locator('[data-share-kind="link"]');
   await expect(note).toContainText("public example");
   await expect(links).toHaveCount(4);
-  await expect(page.locator('[data-link-card="linuxtoy-os-guide"] a'))
+  await expect(page.locator('[data-share-id="linuxtoy-os-guide"] a'))
     .toHaveAttribute("href", "https://i.linuxtoy.org/docs/guide/index.html");
   await expect(page.locator('[data-share-id="external-markdown-guide"] a'))
     .toHaveAttribute("href", "https://example.com/notes/guide.md");

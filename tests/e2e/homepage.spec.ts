@@ -155,6 +155,6 @@ test("playground terminal explores sections as a local filesystem", async ({ pag
   await expect(links.first()).toBeHidden();
   await page.getByRole("link", { name: /Education/ }).click();
   await page.getByRole("link", { name: /Playground/ }).click();
-  await expect(note).toBeVisible();
+  await expect(note).toBeHidden();
   await expect(links.first()).toBeVisible();
 });

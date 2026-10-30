@@ -36,27 +36,29 @@
 3. **Einstein 彩蛋**:第 6 次 ASK 后 generosity 显示 `100.00%`,回复固定为
    `fine. 100%. but you get the hair too.`;之后再点循环输出低百分比借口(不重置存档)
 
-### 台词库(初稿,可后续调整)
+### 台词库
 
-Manting 催更回复(随机):
+每个随机池约 15 条,集中放在 `src/lib/motivation/lines.ts` 一个文件里,
+纯字符串数组,便于后续扩充修改(加一行即生效,无需动其他代码)。
+
+Manting 开场/催更回复(同一池,随机,~15 条):
 - `noted. this is legally binding motivation now.`
 - `nudges convert to pages at roughly 0.01 pages each.`
 - `einstein's brain would help, but he's still "thinking about it".`
 - `my reviewers are also nudging. everyone is nudging.`
 - `thank you. tell your friends. citations count double.`
-
-Einstein 借口(按 ASK 次数顺序,配 generosity 3.14% → 6.28% → 9.42% → 12.56% → 15.70% → 100%):
-- `interesting proposal. my current generosity: 3.14%`
-- `relative to my output, that's a generous offer.`
-- `my estate lawyers say hi.`
-- `cite my 1905 papers and we'll revisit.`
-- `space is curved, deadlines are not.`
-- `fine. 100%. but you get the hair too.`
-
-开场随机回答:
 - `define "new". my drafts are aging like wine, though.`
 - `peer review is also asking. we're all asking.`
 - `submitting is a 2027 problem. drafting is forever.`
+- …(补足至 15 条,见 lines.ts)
+
+Einstein 台词分两段:
+- **常规池(~14 条随机借口)**,配当前 generosity 百分比:
+  `interesting proposal. my current generosity: X%`、`relative to my output,
+  that's a generous offer.`、`my estate lawyers say hi.`、
+  `cite my 1905 papers and we'll revisit.`、`space is curved, deadlines are not.` …
+- **彩蛋**:第 6 次 ASK 时 generosity 锁定 `100.00%`,固定回复
+  `fine. 100%. but you get the hair too.`;之后继续 ASK 则从常规池随机循环(存档不重置)
 
 ## 终端彩蛋
 

@@ -275,11 +275,6 @@ const publicationGroupLabels: Record<(typeof publicationGroupOrder)[number], str
         .forEach((other) => {
           if (other !== card) other.removeAttribute("open");
         });
-      // Force full-screen size for modal
-      requestAnimationFrame(() => {
-        card.style.width = `${window.innerWidth}px`;
-        card.style.height = `${window.innerHeight}px`;
-      });
     }
   }, true);
 

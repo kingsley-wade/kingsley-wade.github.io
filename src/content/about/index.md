@@ -1,11 +1,11 @@
 ---
 id: about-manting-guo
-title: About Manting
+title: About Me
 summary: Applied mathematics, biological systems, scientific computing, and AI-agent infrastructure.
 status: Learning, researching, and building.
 links:
-  - label: Email
-    url: mailto:kingsleyrex@sjtu.edu.cn
+  - label: Email me
+    url: https://mail.google.com/mail/?view=cm&fs=1&to=mantingguo0820@gmail.com
   - label: GitHub
     url: https://github.com/kingsley-wade
 tags:

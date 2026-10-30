@@ -19,10 +19,10 @@ const routes: SectionRoute[] = [
 const createAdapter = (initialHash = "#about") => {
   let hash = initialHash;
   const calls = {
-    applied: [] as string[],
+    applied: [] as (string | null)[],
     focusedPanels: [] as string[],
-    focusedMenus: [] as string[],
-    titles: [] as string[],
+    focusedMenus: [] as (string | null)[],
+    titles: [] as (string | null)[],
     pushes: [] as string[],
     replacements: [] as string[],
     fallbacks: [] as string[],
@@ -62,29 +62,38 @@ describe("section router", () => {
     expect(calls.titles).toEqual(["Research"]);
   });
 
-  it("activates the fallback for an empty hash without rewriting the URL", () => {
+  it("starts home for an empty hash without rewriting the URL", () => {
     const empty = createAdapter("");
-    expect(createSectionRouter(routes, empty.adapter).activeId).toBe("about");
+    expect(createSectionRouter(routes, empty.adapter).activeId).toBeNull();
+    expect(empty.calls.applied).toEqual([null]);
+    expect(empty.calls.titles).toEqual([null]);
     expect(empty.calls.replacements).toEqual([]);
   });
 
-  it("uses replaceState for unknown hashes", () => {
+  it("treats #home as the home state", () => {
+    const home = createAdapter("#home");
+    expect(createSectionRouter(routes, home.adapter).activeId).toBeNull();
+    expect(home.calls.replacements).toEqual([]);
+  });
+
+  it("returns home for unknown hashes via replaceState", () => {
     const unknown = createAdapter("#missing");
-    expect(createSectionRouter(routes, unknown.adapter).activeId).toBe("about");
+    expect(createSectionRouter(routes, unknown.adapter).activeId).toBeNull();
     expect(unknown.calls.fallbacks).toEqual(["#missing"]);
-    expect(unknown.calls.replacements).toEqual(["#about"]);
+    expect(unknown.calls.replacements).toEqual(["#home"]);
   });
 
   it("uses the same selection path for pointer activation", () => {
-    const { adapter, calls } = createAdapter();
+    const { adapter, calls } = createAdapter("");
     const router = createSectionRouter(routes, adapter);
     expect(router.select("education")).toBe(true);
     expect(calls.pushes).toEqual(["#education"]);
     expect(calls.focusedPanels).toEqual(["education"]);
+    expect(router.select("nope")).toBe(false);
   });
 
   it("maps number keys and Escape without intercepting modifiers", () => {
-    const { adapter, calls } = createAdapter();
+    const { adapter, calls } = createAdapter("");
     const router = createSectionRouter(routes, adapter);
     expect(router.handleShortcut({ key: "6", target: null })).toBe(true);
     expect(router.activeId).toBe("playground");
@@ -93,6 +102,13 @@ describe("section router", () => {
     expect(
       router.handleShortcut({ key: "2", target: null, metaKey: true }),
     ).toBe(false);
+  });
+
+  it("focuses the home menu control when Escape is pressed at home", () => {
+    const { adapter, calls } = createAdapter("");
+    const router = createSectionRouter(routes, adapter);
+    expect(router.handleShortcut({ key: "Escape", target: null })).toBe(true);
+    expect(calls.focusedMenus).toEqual([null]);
   });
 
   it("restores browser history from changed hashes", () => {

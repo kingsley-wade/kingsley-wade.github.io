@@ -1,0 +1,93 @@
+<section class="motivation-exe" data-motivation aria-label="Interactive motivation panel">
+  <p class="motivation-exe__title">&gt; MOTIVATION.EXE</p>
+  <div class="motivation-exe__log" data-motivation-log></div>
+  <div class="motivation-exe__actions">
+    <button type="button" data-motivation-push>Push Manting</button>
+    <button type="button" data-motivation-einstein>Ask Einstein</button>
+  </div>
+  <p class="motivation-exe__status" data-motivation-status></p>
+</section>
+
+<script>
+  import {
+    createMotivationStore,
+    MOTIVATION_EVENTS,
+    type MotivationTurn,
+  } from "../lib/motivation/store";
+
+  const panel = document.querySelector<HTMLElement>("[data-motivation]");
+  if (panel) {
+    const log = panel.querySelector<HTMLElement>("[data-motivation-log]");
+    const status = panel.querySelector<HTMLElement>("[data-motivation-status]");
+    const store = createMotivationStore();
+    let opened = false;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const appendTurns = (turns: MotivationTurn[]) => {
+      if (!log) return;
+      const rows = turns.map((turn) => {
+        const line = document.createElement("p");
+        line.className = `motivation-exe__line motivation-exe__line--${turn.speaker}`;
+        line.textContent = `> ${turn.speaker === "you" ? "you" : turn.speaker}: ${turn.text}`;
+        return line;
+      });
+      rows.forEach((row) => log.append(row));
+      if (reducedMotion) {
+        log.scrollTop = log.scrollHeight;
+        return;
+      }
+      // Reveal rows one at a time for the typewriter feel.
+      rows.forEach((row, index) => {
+        row.style.visibility = "hidden";
+        window.setTimeout(() => {
+          row.style.visibility = "";
+          log.scrollTop = log.scrollHeight;
+        }, index * 350);
+      });
+    };
+
+    const renderStatus = () => {
+      if (status) status.textContent = store.snapshot().statusLine;
+    };
+
+    const open = () => {
+      if (opened) return;
+      opened = true;
+      appendTurns(store.opening());
+    };
+
+    panel
+      .querySelector<HTMLButtonElement>("[data-motivation-push]")
+      ?.addEventListener("click", () => appendTurns(store.nudge()));
+    panel
+      .querySelector<HTMLButtonElement>("[data-motivation-einstein]")
+      ?.addEventListener("click", () => appendTurns(store.askEinstein()));
+
+    window.addEventListener(MOTIVATION_EVENTS.updated, renderStatus);
+    store.subscribe(renderStatus);
+    renderStatus();
+
+    document
+      .querySelector<HTMLButtonElement>("[data-motivation-ask]")
+      ?.addEventListener("click", () => {
+        panel.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
+        open();
+      });
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            open();
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.3 },
+      );
+      observer.observe(panel);
+    } else {
+      open();
+    }
+  }
+</script>

@@ -1,8 +1,8 @@
 <section class="interest-console" data-interest-console aria-label="Personal interest interactions">
   <div class="interest-console__actions">
-    <button type="button" data-interest-action="reading">READ</button>
-    <button type="button" data-interest-action="fitness">MOVE</button>
-    <button type="button" data-interest-action="guitar">STRUM</button>
+    <button type="button" data-interest-action="reading">READING</button>
+    <button type="button" data-interest-action="fitness">FITNESS</button>
+    <button type="button" data-interest-action="guitar">GUITAR</button>
   </div>
   <div class="interest-console__scene" data-interest-scene aria-hidden="true">
     <span class="interest-console__book">[|||]</span>
@@ -56,8 +56,7 @@
     }, 900);
   };
 
-  const playGuitar = async (scale: AudioScaleId) => {
-    showEffect("guitar");
+  const playNote = async (scale: AudioScaleId) => {
     const result = await getGuitarEngine()?.playScale(scale);
     if (!status || !result) {
       if (status) status.textContent = "AUDIO UNAVAILABLE";
@@ -70,8 +69,20 @@
         : "NOTE UNAVAILABLE";
   };
 
+  const playGuitar = async (scale: AudioScaleId) => {
+    showEffect("guitar");
+    await playNote(scale);
+  };
+
   const runInterest = (action: string) => {
-    if (action === "reading" || action === "fitness") showEffect(action);
+    if (action === "reading") {
+      showEffect("reading");
+      void playNote("c-major");
+    }
+    if (action === "fitness") {
+      showEffect("fitness");
+      void playNote("d-dorian");
+    }
     if (action === "guitar") void playGuitar("e-minor-pentatonic");
   };
 

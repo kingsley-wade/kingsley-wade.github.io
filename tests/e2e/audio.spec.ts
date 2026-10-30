@@ -20,6 +20,7 @@ test("sound preference controls the persistent background track", async ({
   await expect(page.getByRole("button", { name: "Pause background music" })).toBeVisible();
   await expect.poll(() => trackRequests.length).toBe(1);
 
+  await page.getByRole("button", { name: "FILES" }).click();
   await page.getByRole("link", { name: /Research/ }).click();
   await expect(page.getByRole("button", { name: "Pause background music" })).toBeVisible();
   expect(trackRequests).toHaveLength(1);
@@ -33,6 +34,7 @@ test("playground terminal executes a whitelist and treats input as text", async 
 }) => {
   await page.goto("/#playground");
   await page.getByRole("button", { name: "ENTER MUTED" }).click();
+  await page.keyboard.press("Control+K");
 
   const input = page.getByRole("textbox", { name: "Command" });
   const output = page.locator("[data-terminal-output]");

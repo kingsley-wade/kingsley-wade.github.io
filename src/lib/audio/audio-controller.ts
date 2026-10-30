@@ -256,6 +256,7 @@ export const getBackgroundAudioController = (
     options?.track ?? tracks[Math.floor(Math.random() * tracks.length)] ?? audioConfig.backgroundTrack;
   backgroundAudioController = new BackgroundAudioController({
     track: selectedTrack,
+    tracks,
     defaultMuted: options?.defaultMuted ?? audioConfig.defaultMuted,
     defaultVolume: options?.defaultVolume ?? audioConfig.defaultVolume,
     storage,

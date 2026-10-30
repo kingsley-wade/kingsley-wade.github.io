@@ -5,11 +5,13 @@ import { siteConfig } from "../config/site";
 import type { SectionManifest } from "../core/section-contract";
 import { getValidatedSectionEntries } from "../lib/content/public-content";
 import { getValidatedShares } from "../lib/content/public-content";
+import { groupPublicationViews, type PublicationView } from "../lib/content/publication-view";
 import AudioControls from "./AudioControls.astro";
 import AssistantStatus from "./AssistantStatus.astro";
 import InterestInteractions from "./InterestInteractions.astro";
+import MotivationExe from "./MotivationExe.astro";
 import ContentPanel from "./ContentPanel.astro";
-import PlaygroundTerminal from "./PlaygroundTerminal.astro";
+import GlobalTerminal from "./GlobalTerminal.astro";
 import TerminalIdentity from "./TerminalIdentity.astro";
 import TerminalMenu from "./TerminalMenu.astro";
 import PlaygroundShares from "./PlaygroundShares.astro";
@@ -48,21 +50,88 @@ await Promise.all(
     contentBySection.set(section.id, rendered);
   }),
 );
+const publicationGroups = groupPublicationViews(
+  (contentBySection.get("publications") ?? []).map(({ entry }) => entry.data as PublicationView),
+);
+const publicationGroupOrder = ["published", "under-review", "preprint"] as const;
+const publicationGroupLabels: Record<(typeof publicationGroupOrder)[number], string> = {
+  published: "Published",
+  "under-review": "Under review",
+  preprint: "Preprint",
+};
 ---
 
 <main id="main-content" class="app-shell">
   <TerminalIdentity />
   <AudioControls />
+  <GlobalTerminal
+    sections={sections}
+    shares={shares.map(({ id, data }) => ({ id, kind: data.kind, title: data.title }))}
+  />
   {siteConfig.features.assistantStatus ? <AssistantStatus /> : null}
   <div class="app-shell__workspace">
     <TerminalMenu sections={sections} />
     <div class="app-shell__content" aria-live="polite">
+      <p class="app-shell__home-hint" data-home-hint aria-hidden="true">
+        &gt; cd research · pick a file from FILES · or press 1-7
+      </p>
       {
         sections.map((section, index) => {
           const items = contentBySection.get(section.id) ?? [];
           return (
-            <ContentPanel section={section} number={index + 1} active={index === 0}>
-              {items.length > 0 ? (
+            <ContentPanel section={section} number={index + 1}>
+              {section.id === "publications" && items.length > 0 ? (
+                <div class="publication-groups">
+                  <p class="publication-intro">
+                    Not many papers yet — I asked Einstein to donate his brain to speed things
+                    up, and he's still thinking about it.
+                    <button type="button" class="publication-intro__ask" data-motivation-ask>
+                      wanna ask?
+                    </button>
+                  </p>
+                  {publicationGroupOrder.map((group) => {
+                    const views = publicationGroups[group];
+                    if (views.length === 0) return null;
+                    return (
+                      <div class="publication-group" data-publication-group={group}>
+                        <h3 class="publication-group__title">{publicationGroupLabels[group]}</h3>
+                        <div class="content-list">
+                          {views.map((view) => (
+                            <article class="content-entry" id={view.id}>
+                              <header>
+                                {group === "published" && view.year ? (
+                                  <p class="content-entry__period">{view.year}</p>
+                                ) : null}
+                                <h3>{view.title}</h3>
+                                {"venue" in view && view.venue ? (
+                                  <p class="content-entry__institution">{view.venue}</p>
+                                ) : null}
+                                <p class="content-entry__authors">{view.authors.join(", ")}</p>
+                              </header>
+                              {view.summary ? <p>{view.summary}</p> : null}
+                              <p class="content-entry__status">{view.statusLabel}</p>
+                              {view.primaryUrl ? (
+                                <ul class="content-entry__links">
+                                  <li>
+                                    <a href={view.primaryUrl}>
+                                      {group === "published"
+                                        ? "View publication"
+                                        : group === "preprint"
+                                          ? "Read preprint"
+                                          : "OpenReview"}
+                                    </a>
+                                  </li>
+                                </ul>
+                              ) : null}
+                            </article>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <MotivationExe />
+                </div>
+              ) : items.length > 0 ? (
                 <div class="content-list">
                   {items.map(({ entry, Content }) => {
                     const data = entry.data;
@@ -100,7 +169,35 @@ await Promise.all(
                           <ul class="content-entry__links">
                             {data.links.map((link) => (
                               <li>
-                                <a href={link.url}>{link.label}</a>
+                                {link.url.startsWith("https://mail.google.com") ? (
+                                  <details class="email-reveal">
+                                    <summary>Email me</summary>
+                                    <ul class="email-reveal__options">
+                                      <li>
+                                        <a
+                                          href={link.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                        >
+                                          Open Gmail compose
+                                        </a>
+                                      </li>
+                                      <li>
+                                        <span class="email-reveal__address">
+                                          {new URL(link.url).searchParams.get("to")}
+                                        </span>
+                                      </li>
+                                    </ul>
+                                  </details>
+                                ) : (
+                                  <a
+                                    href={link.url}
+                                    target={link.url.startsWith("http") ? "_blank" : undefined}
+                                    rel={link.url.startsWith("http") ? "noopener noreferrer" : undefined}
+                                  >
+                                    {link.label}
+                                  </a>
+                                )}
                               </li>
                             ))}
                           </ul>
@@ -118,13 +215,36 @@ await Promise.all(
               {section.renderer === "life" ? <InterestInteractions /> : null}
               {section.renderer === "playground" ? (
                 <>
-                  <ReactionDiffusionLab />
-                  <BlackjackArcade />
-                  <PlaygroundShares entries={shares} />
-                  <PlaygroundTerminal
-                    sections={sections}
-                    shares={shares.map(({ id, data }) => ({ id, kind: data.kind, title: data.title }))}
-                  />
+                  <div class="playground-cards">
+                    <details class="playground-card" data-playground-card="lab">
+                      <summary>
+                        <span class="playground-card__eyebrow">LAB 01</span>
+                        <span class="playground-card__title">Reaction–Diffusion Lab</span>
+                        <span class="playground-card__hint">grow patterns from simple rules</span>
+                      </summary>
+                      <ReactionDiffusionLab />
+                    </details>
+                    <details class="playground-card" data-playground-card="arcade">
+                      <summary>
+                        <span class="playground-card__eyebrow">ARCADE</span>
+                        <span class="playground-card__title">21 · Dealer's Chase</span>
+                        <span class="playground-card__hint">reach 21 before the dealer</span>
+                      </summary>
+                      <BlackjackArcade />
+                    </details>
+                    <details class="playground-card" data-playground-card="reading">
+                      <summary>
+                        <span class="playground-card__eyebrow">SHELF</span>
+                        <span class="playground-card__title">Reading Shelf</span>
+                        <span class="playground-card__hint">blogs and guides I keep returning to</span>
+                      </summary>
+                      <PlaygroundShares entries={shares} />
+                    </details>
+                  </div>
+                  <p class="content-panel__hint">
+                    Press <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd> to open the site terminal and
+                    navigate with commands like <code>cd research</code>.
+                  </p>
                 </>
               ) : null}
             </ContentPanel>
@@ -139,4 +259,36 @@ await Promise.all(
   import { initSectionRouter } from "../lib/navigation/router";
 
   initSectionRouter();
+
+  const openCard = () =>
+    document.querySelector<HTMLDetailsElement>(".playground-card[open]");
+
+  document.addEventListener("toggle", (event) => {
+    const card = event.target as HTMLElement;
+    if (
+      event.target instanceof HTMLDetailsElement &&
+      card.matches(".playground-card") &&
+      (event as ToggleEvent).newState === "open"
+    ) {
+      document
+        .querySelectorAll<HTMLDetailsElement>(".playground-card[open]")
+        .forEach((other) => {
+          if (other !== card) other.removeAttribute("open");
+        });
+      // Force full-screen size for modal
+      requestAnimationFrame(() => {
+        card.style.width = `${window.innerWidth}px`;
+        card.style.height = `${window.innerHeight}px`;
+      });
+    }
+  }, true);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") openCard()?.removeAttribute("open");
+  });
+
+  document.addEventListener("click", (event) => {
+    const card = openCard();
+    if (card && event.target === card) card.removeAttribute("open");
+  });
 </script>

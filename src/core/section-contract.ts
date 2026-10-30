@@ -38,6 +38,8 @@ export const terminalCommandIds = [
   "fitness",
   "music",
   "arcade",
+  "nudge",
+  "ask",
   "clear",
 ] as const;
 export type TerminalCommandId = (typeof terminalCommandIds)[number];

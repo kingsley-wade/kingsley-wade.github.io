@@ -36,7 +36,7 @@ export const siteConfig: SiteConfig = {
   identity: {
     displayName: "Manting Guo",
     handle: "kingsley-wade",
-    affiliation: "Shanghai Jiao Tong University",
+    affiliation: "Shanghai Jiao Tong University · Shenzhen Loop Area Institute",
     focus: "AI & Applied Mathematics",
   },
   metadata: {

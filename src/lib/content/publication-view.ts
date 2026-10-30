@@ -1,6 +1,6 @@
 import type { PublicationData } from "./schemas";
 
-export type PublicationGroup = "published" | "work-in-progress";
+export type PublicationGroup = "published" | "under-review" | "preprint";
 
 export type PublicationView = PublicationData & {
   group: PublicationGroup;
@@ -11,6 +11,7 @@ export type PublicationView = PublicationData & {
 const statusLabels: Record<PublicationData["status"], string> = {
   published: "Published",
   accepted: "Accepted",
+  preprint: "Preprint",
   "under-review": "Under review",
   "in-progress": "In progress",
 };
@@ -20,7 +21,9 @@ export const toPublicationView = (entry: PublicationData): PublicationView => ({
   group:
     entry.status === "published" || entry.status === "accepted"
       ? "published"
-      : "work-in-progress",
+      : entry.status === "preprint"
+        ? "preprint"
+        : "under-review",
   statusLabel: statusLabels[entry.status],
   primaryUrl: entry.doi
     ? `https://doi.org/${entry.doi.replace(/^https?:\/\/doi\.org\//, "")}`
@@ -32,7 +35,8 @@ export const groupPublicationViews = (
 ): Record<PublicationGroup, PublicationView[]> => {
   const grouped: Record<PublicationGroup, PublicationView[]> = {
     published: [],
-    "work-in-progress": [],
+    "under-review": [],
+    preprint: [],
   };
   for (const entry of entries) {
     const view = toPublicationView(entry);

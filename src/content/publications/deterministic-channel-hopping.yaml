@@ -1,0 +1,18 @@
+id: deterministic-channel-hopping
+title: "Beyond Sequence Metrics: State-Space Coverage and Algorithmic Design in Deterministic Channel Hopping"
+summary: State-graph modeling and simulation of deterministic channel-hopping algorithms.
+authors:
+  - Manting Guo
+  - Peiru Kuang
+  - Yan Wang
+kind: working-paper
+status: under-review
+venue: SIAM
+order: 50
+links: []
+tags:
+  - modeling
+  - simulation
+  - wireless networks
+visibility: public
+updatedAt: "2026-10-29"

@@ -1,0 +1,23 @@
+id: structure-biomolecular-condensates
+title: "Biomolecular condensates bridge experiment and theory of mass-conserving reaction-diffusion systems in phase separation"
+summary: Mathematical modeling and numerical analysis of mass-conserving reaction-diffusion systems in phase separation.
+authors:
+  - Cheng Li
+  - Man-Ting Guo
+  - Xiaoqing He
+  - Quan-Xing Liu
+  - Zhi Qi
+kind: journal
+status: published
+venue: "Structure, volume 33, pages 1–14"
+year: 2025
+url: https://www.cell.com/structure/fulltext/S0969-2126(25)00216-3
+order: 10
+links:
+  - label: Article
+    url: https://www.cell.com/structure/fulltext/S0969-2126(25)00216-3
+tags:
+  - reaction-diffusion
+  - mathematical biology
+visibility: public
+updatedAt: "2026-10-29"

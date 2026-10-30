@@ -4,13 +4,13 @@ title: Scaling Laws in Cross-Scale Systems
 summary: Scaling laws, bifurcation analysis, and system dynamics.
 period: "2024"
 role: Research project
-order: 30
+order: 60
 links: []
 tags:
   - scaling laws
   - bifurcation analysis
 visibility: public
-updatedAt: "2026-09-28"
+updatedAt: "2026-10-29"
 ---
 
 Derived scaling laws and used Fortran with AUTO for bifurcation analysis,

@@ -49,6 +49,7 @@ export const publicationKinds = [
 export const publicationStatuses = [
   "published",
   "accepted",
+  "preprint",
   "under-review",
   "in-progress",
 ] as const;
@@ -61,6 +62,7 @@ export const publicationSchema = publicEntryBase.extend({
   year: z.number().int().min(1900).max(2100).optional(),
   doi: z.string().min(1).optional(),
   url: z.url().optional(),
+  order: z.number().int().nonnegative().default(0),
   mock: z.boolean().default(false),
 });
 

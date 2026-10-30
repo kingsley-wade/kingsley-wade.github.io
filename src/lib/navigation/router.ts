@@ -3,14 +3,16 @@ export type SectionRoute = {
   label: string;
 };
 
+export const HOME_ID = "home";
+
 export type RouteAdapter = {
   readHash(): string;
   pushHash(hash: string): void;
   replaceHash(hash: string): void;
-  applyActive(id: string): void;
+  applyActive(id: string | null): void;
   focusPanel(id: string): void;
-  focusMenu(id: string): void;
-  setTitle(label: string): void;
+  focusMenu(id: string | null): void;
+  setTitle(label: string | null): void;
   reportFallback(invalidHash: string): void;
 };
 
@@ -43,28 +45,34 @@ export const createSectionRouter = (
 ) => {
   if (routes.length === 0) throw new Error("Section router requires at least one route");
   const routeById = new Map(routes.map((route) => [route.id, route]));
-  const fallback = routes[0];
-  let activeId = fallback.id;
+  let activeId: string | null = null;
 
   const activate = (id: string, focusPanel: boolean) => {
-    const route = routeById.get(id) ?? fallback;
+    const route = routeById.get(id);
+    if (!route) return;
     activeId = route.id;
     adapter.applyActive(route.id);
     adapter.setTitle(route.label);
     if (focusPanel) adapter.focusPanel(route.id);
   };
 
+  const activateHome = () => {
+    activeId = null;
+    adapter.applyActive(null);
+    adapter.setTitle(null);
+  };
+
   const syncFromLocation = (focusPanel = false) => {
     const rawHash = adapter.readHash();
     const requested = sectionIdFromHash(rawHash);
-    if (!requested) {
-      activate(fallback.id, focusPanel);
+    if (!requested || requested === HOME_ID) {
+      activateHome();
       return;
     }
     if (!routeById.has(requested)) {
       adapter.reportFallback(rawHash);
-      adapter.replaceHash(`#${fallback.id}`);
-      activate(fallback.id, focusPanel);
+      adapter.replaceHash(`#${HOME_ID}`);
+      activateHome();
       return;
     }
     activate(requested, focusPanel);
@@ -128,6 +136,7 @@ export const initSectionRouter = (): (() => void) => {
         if (link.dataset.sectionLink === id) link.setAttribute("aria-current", "page");
         else link.removeAttribute("aria-current");
       }
+      document.documentElement.dataset.activeSection = id ?? "";
       const activeLink = links.find((link) => link.dataset.sectionLink === id);
       window.dispatchEvent(
         new CustomEvent("section:changed", {
@@ -143,15 +152,17 @@ export const initSectionRouter = (): (() => void) => {
         .querySelector<HTMLElement>(`[data-section-panel="${CSS.escape(id)}"] h2`)
         ?.focus(),
     focusMenu: (id) =>
-      document
-        .querySelector<HTMLElement>(`[data-section-link="${CSS.escape(id)}"]`)
-        ?.focus(),
+      id
+        ? document
+            .querySelector<HTMLElement>(`[data-section-link="${CSS.escape(id)}"]`)
+            ?.focus()
+        : document.querySelector<HTMLElement>("[data-menu-toggle]")?.focus(),
     setTitle: (label) => {
-      document.title = `${label} | ${baseTitle}`;
+      document.title = label ? `${label} | ${baseTitle}` : baseTitle;
     },
     reportFallback: (invalidHash) => {
       document.documentElement.dataset.routeFallback = invalidHash || "empty";
-      console.warn(`Unknown section hash ${invalidHash}; showing ${routes[0]?.id}.`);
+      console.warn(`Unknown section hash ${invalidHash}; returning home.`);
     },
   };
   const router = createSectionRouter(routes, adapter);

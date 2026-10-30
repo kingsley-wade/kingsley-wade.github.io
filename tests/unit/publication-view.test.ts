@@ -12,10 +12,11 @@ describe("publication view model", () => {
       .toEqual(["Published", "Accepted", "Under review", "In progress"]);
   });
 
-  it("groups completed and active work", () => {
+  it("groups publications into published, under-review, and preprint", () => {
     const groups = groupPublicationViews(mockPublicationEntries);
     expect(groups.published).toHaveLength(2);
-    expect(groups["work-in-progress"]).toHaveLength(2);
+    expect(groups["under-review"]).toHaveLength(2);
+    expect(groups.preprint).toHaveLength(0);
   });
 
   it("uses DOI first and tolerates missing DOI or URL", () => {

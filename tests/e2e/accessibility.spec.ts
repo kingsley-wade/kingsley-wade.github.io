@@ -21,5 +21,5 @@ test("keyboard entry transfers focus to the primary menu", async ({ page }) => {
   await page.goto("/");
   await page.keyboard.press("Enter");
   await expect(page.locator("[data-splash-gate]")).toBeHidden();
-  await expect(page.locator('[data-section-link="about"]')).toBeFocused();
+  await expect(page.locator("[data-menu-toggle]")).toBeFocused();
 });

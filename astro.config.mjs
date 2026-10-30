@@ -1,4 +1,6 @@
 import { defineConfig } from "astro/config";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 const normalizeBase = (value) => {
   const trimmed = value.trim();
@@ -12,4 +14,8 @@ export default defineConfig({
   base: normalizeBase(process.env.BASE_URL ?? "/"),
   trailingSlash: "never",
   devToolbar: { enabled: false },
+  markdown: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeKatex],
+  },
 });

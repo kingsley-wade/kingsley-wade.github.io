@@ -1,6 +1,6 @@
 id: branch-fail-recover
 title: "Branch, Fail, Recover: A Spectral Theory of Reliable Agent Execution"
-summary: A sole-authored spectral analysis of branching, retries, and recovery in agent workflows.
+summary: Spectral analysis of branching, retries, and recovery in agent workflows.
 authors:
   - Manting Guo
 kind: conference

@@ -4,7 +4,7 @@ import { parseTerminalInput } from "./parser";
 import type { SectionManifest } from "../../core/section-contract";
 import type { TerminalShare } from "./filesystem";
 
-export const initPlaygroundTerminal = (
+export const initSiteTerminal = (
   sections: readonly SectionManifest[],
   shares: readonly TerminalShare[] = [],
 ): void => {
@@ -47,12 +47,18 @@ export const initPlaygroundTerminal = (
       return;
     }
     const effect = executeTerminalCommand(parsed.command, parsed.args, filesystem);
+    if (parsed.command === "cd" && parsed.args[0] === "~") {
+      window.location.hash = "home";
+      appendLine("moved to ~ (home)", "output");
+      return;
+    }
     if (effect.clear) output.replaceChildren();
     for (const line of effect.lines) appendLine(line, parsed.command === "help" ? "help" : "output");
     if (effect.currentPath) updatePrompt();
     if (effect.pathChanged && effect.currentPath) dispatchPathChanged(effect.currentPath);
     if (status) status.textContent = effect.navigateTo ? "OPEN" : "READY";
     if (effect.navigateTo) {
+      window.dispatchEvent(new CustomEvent("terminal:navigated", { detail: { id: effect.navigateTo } }));
       document.querySelector<HTMLAnchorElement>(`[data-section-link="${CSS.escape(effect.navigateTo)}"]`)?.click();
     }
     if (effect.focusItemId) {
@@ -71,9 +77,19 @@ export const initPlaygroundTerminal = (
       const [command, partial = ""] = input.value.trim().split(/\s+/, 2);
       if (command === "cd" || command === "open") {
         const matches = filesystem.completions(partial);
-        if (matches.length === 1) {
+        if (matches.length > 0) {
           event.preventDefault();
-          input.value = `${command} ${matches[0]}`;
+          const prefix = matches.reduce((acc, candidate) => {
+            let end = 0;
+            while (end < acc.length && end < candidate.length && acc[end] === candidate[end]) end += 1;
+            return acc.slice(0, end);
+          });
+          if (prefix) input.value = `${command} ${prefix}`;
+          if (matches.length > 1) appendLine(`${command} ${partial}<TAB>`, "command");
+          const suffix = command === "cd" ? "/" : "";
+          for (const match of matches) {
+            appendLine(`  ${match}${suffix}`, "help");
+          }
         }
       }
       return;
@@ -84,13 +100,8 @@ export const initPlaygroundTerminal = (
     historyIndex = Math.max(0, Math.min(history.length, historyIndex));
     input.value = history[historyIndex] ?? "";
   });
-  let initialSectionSync = true;
   window.addEventListener("section:changed", (event) => {
     const detail = (event as CustomEvent<{ id?: string }>).detail;
-    if (initialSectionSync) {
-      initialSectionSync = false;
-      return;
-    }
     filesystem.setCurrentSection(detail?.id);
     updatePrompt();
     dispatchPathChanged(filesystem.currentPath);

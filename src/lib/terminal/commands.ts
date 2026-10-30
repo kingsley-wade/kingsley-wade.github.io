@@ -1,4 +1,7 @@
 import type { TerminalCommandId } from "../../core/section-contract";
+import {
+  createMotivationStore,
+} from "../motivation/store";
 import type { TerminalFilesystem } from "./filesystem";
 
 export type TerminalEffect = {
@@ -15,7 +18,7 @@ export type TerminalEffect = {
 export const terminalHelp = [
   "NAVIGATION",
   "ls       list the current directory",
-  "cd PATH  navigate directories (cd .. moves to the parent)",
+  "cd PATH  navigate directories (cd .. moves to the parent, cd ~ returns home)",
   "pwd      print the current path",
   "open ITEM_ID  focus a playground share",
   "tree     show sections and playground shares",
@@ -27,6 +30,8 @@ export const terminalHelp = [
   "fitness  trigger a training break",
   "music    toggle the background track",
   "arcade   start the Playground side quest",
+  "nudge    push manting to write",
+  "ask WHO  ask manting or einstein (ask einstein negotiates brain donation)",
   "status   show the current section",
   "",
   "UTILITIES",
@@ -83,6 +88,26 @@ export const executeTerminalCommand = (
         lines: ["side quest unlocked: 21 · Dealer's Chase"],
         interaction: "arcade",
       };
+    case "nudge": {
+      const turns = createMotivationStore().nudge();
+      return {
+        lines: [...turns.map((turn) => `> ${turn.speaker}: ${turn.text}`), createMotivationStore().snapshot().statusLine],
+      };
+    }
+    case "ask": {
+      const target = (args[0] ?? "manting").toLowerCase();
+      if (target === "einstein") {
+        const turns = createMotivationStore().askEinstein();
+        return {
+          lines: [...turns.map((turn) => `> ${turn.speaker}: ${turn.text}`), createMotivationStore().snapshot().statusLine],
+        };
+      }
+      if (target === "manting") {
+        const turns = createMotivationStore().opening();
+        return { lines: turns.map((turn) => `> ${turn.speaker}: ${turn.text}`) };
+      }
+      return { lines: ["usage: ask manting | ask einstein"] };
+    }
     case "clear":
       return { lines: [], clear: true };
   }

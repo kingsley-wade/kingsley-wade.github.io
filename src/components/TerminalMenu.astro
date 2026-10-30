@@ -8,8 +8,23 @@ type Props = {
 const { sections } = Astro.props;
 ---
 
-<nav class="terminal-menu" aria-label="Primary sections" data-primary-menu>
-  <ol>
+<nav
+  class="side-menu"
+  aria-label="Primary sections"
+  data-primary-menu
+  data-menu-collapsed="true"
+>
+  <button
+    type="button"
+    class="side-menu__toggle"
+    data-menu-toggle
+    aria-expanded="false"
+    aria-controls="side-menu-list"
+  >
+    <span class="side-menu__burger" aria-hidden="true"></span>
+    <span class="side-menu__toggle-label">FILES</span>
+  </button>
+  <ol id="side-menu-list" class="side-menu__list">
     {
       sections.map((section, index) => (
         <li>
@@ -18,7 +33,6 @@ const { sections } = Astro.props;
             data-section-link={section.id}
             data-section-label={section.label}
             data-audio-scale={section.audioScale}
-            aria-current={index === 0 ? "page" : undefined}
           >
             <span aria-hidden="true">[{index + 1}]</span>
             <span>{section.label}</span>
@@ -28,3 +42,50 @@ const { sections } = Astro.props;
     }
   </ol>
 </nav>
+
+<script>
+  const initSideMenu = () => {
+    const menu = document.querySelector<HTMLElement>("[data-primary-menu]");
+    const toggle = menu?.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+    if (!menu || !toggle) return;
+
+    const setCollapsed = (collapsed: boolean) => {
+      menu.dataset.menuCollapsed = String(collapsed);
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+    };
+
+    toggle.addEventListener("click", () => {
+      setCollapsed(menu.dataset.menuCollapsed === "false");
+    });
+
+    menu.querySelector(".side-menu__list")?.addEventListener("click", (event) => {
+      if ((event.target as HTMLElement).closest("[data-section-link]")) {
+        setCollapsed(true);
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (
+        menu.dataset.menuCollapsed === "false" &&
+        event.target instanceof Node &&
+        !menu.contains(event.target)
+      ) {
+        setCollapsed(true);
+      }
+    });
+
+    // Expand before the router's Escape handler focuses a menu link,
+    // otherwise the link is still visibility:hidden and focus fails.
+    window.addEventListener(
+      "keydown",
+      (event) => {
+        if (event.key === "Escape" && menu.dataset.menuCollapsed !== "false") {
+          setCollapsed(false);
+        }
+      },
+      true,
+    );
+  };
+
+  initSideMenu();
+</script>

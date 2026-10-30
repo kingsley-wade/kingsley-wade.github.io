@@ -1,0 +1,80 @@
+---
+import type { SectionManifest } from "../core/section-contract";
+import type { TerminalShare } from "../lib/terminal/filesystem";
+
+type Props = { sections: readonly SectionManifest[]; shares?: readonly TerminalShare[] };
+const { sections, shares = [] } = Astro.props;
+---
+
+<button type="button" class="global-terminal__toggle" data-terminal-toggle aria-expanded="false" aria-controls="global-terminal-panel">
+  TERMINAL <kbd>⌘K</kbd>
+</button>
+
+<div class="global-terminal" id="global-terminal-panel" data-terminal-wrapper hidden>
+  <section
+    class="playground-terminal global-terminal__panel"
+    aria-label="Site terminal"
+    data-terminal
+    data-sections={JSON.stringify(sections)}
+    data-shares={JSON.stringify(shares)}
+  >
+    <header class="playground-terminal__header">
+      <span aria-hidden="true">LOCAL.SHELL</span>
+      <span class="playground-terminal__status" data-terminal-status>READY</span>
+    </header>
+    <ol class="playground-terminal__output" data-terminal-output aria-live="polite">
+      <li class="playground-terminal__line--status">local shell ready - type <strong>help</strong> to begin</li>
+    </ol>
+    <form class="playground-terminal__form" data-terminal-form>
+      <label for="terminal-command">Command</label>
+      <div class="playground-terminal__prompt">
+        <span aria-hidden="true" data-terminal-prompt>guest@local:/$</span>
+        <input
+          id="terminal-command"
+          name="command"
+          type="text"
+          maxlength="80"
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+        />
+      </div>
+      <button type="submit">RUN</button>
+    </form>
+  </section>
+</div>
+
+<script>
+  import { initSiteTerminal } from "../lib/terminal/client";
+
+  const wrapper = document.querySelector<HTMLElement>("[data-terminal-wrapper]");
+  const toggle = document.querySelector<HTMLButtonElement>("[data-terminal-toggle]");
+
+  const isOpen = () => Boolean(wrapper && !wrapper.hidden);
+  const setOpen = (open: boolean) => {
+    if (!wrapper || !toggle) return;
+    wrapper.hidden = !open;
+    toggle.setAttribute("aria-expanded", String(open));
+    if (open) {
+      wrapper.querySelector<HTMLInputElement>("[data-terminal-form] input")?.focus();
+    }
+  };
+
+  toggle?.addEventListener("click", () => setOpen(!isOpen()));
+
+  window.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      setOpen(!isOpen());
+      return;
+    }
+    if (event.key === "Escape" && isOpen()) setOpen(false);
+  });
+
+  window.addEventListener("terminal:navigated", () => setOpen(false));
+
+  initSiteTerminal(
+    JSON.parse(document.querySelector<HTMLElement>("[data-terminal]")?.dataset.sections ?? "[]"),
+    JSON.parse(document.querySelector<HTMLElement>("[data-terminal]")?.dataset.shares ?? "[]"),
+  );
+</script>

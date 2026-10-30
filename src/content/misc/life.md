@@ -1,6 +1,6 @@
 ---
 id: life-interests
-title: Away from the terminal
+title: Hobbies & Interests
 summary: Fitness, reading, and fingerstyle guitar are the three habits I return to most.
 sectionId: life
 order: 10
@@ -18,5 +18,4 @@ fingerstyle guitar. Music is part of how this site responds: navigation notes
 draw from different guitar scales.
 
 My favorite film is *La La Land*, and a favorite television series is *Normal
-People*. Their quiet, musical atmosphere informs some of the site's small
-details without turning the page into a fan site.
+People*.

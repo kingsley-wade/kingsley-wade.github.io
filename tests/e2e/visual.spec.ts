@@ -12,7 +12,8 @@ test("all approved viewports fit without horizontal overflow", async ({ page }) 
     await page.setViewportSize(viewport);
     await page.goto("/");
     await page.getByRole("button", { name: "ENTER MUTED" }).click();
-    await expect(page.locator("[data-section-panel='about']")).toBeVisible();
+    await expect(page.locator("[data-home-hint]")).toBeVisible();
+    await expect(page.locator("[data-section-panel='about']")).toBeHidden();
 
     const dimensions = await page.evaluate(() => ({
       documentWidth: document.documentElement.scrollWidth,

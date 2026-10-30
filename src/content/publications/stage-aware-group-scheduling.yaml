@@ -1,0 +1,22 @@
+id: stage-aware-group-scheduling
+title: Stage-Aware Group Scheduling for Offline Agent Workloads
+summary: A stage-aware mixed-integer scheduler for offline agent workflows; the manuscript is at final decision for AAAI 2027.
+authors:
+  - Man-Ting Guo
+  - Yan Wang
+  - Bowen Pang
+kind: conference
+status: under-review
+venue: AAAI 2027
+year: 2027
+url: https://openreview.net/forum?id=xpJiRqbBUk
+order: 30
+links:
+  - label: OpenReview
+    url: https://openreview.net/forum?id=xpJiRqbBUk
+tags:
+  - agent systems
+  - scheduling
+  - mixed-integer programming
+visibility: public
+updatedAt: "2026-10-29"

@@ -1,7 +1,7 @@
 ---
 id: about-manting-guo
 title: About Me
-summary: Applied mathematics, biological systems, scientific computing, and AI-agent infrastructure.
+summary: Applied mathematics, AI-agent infrastructure, and a detour through mountains.
 status: Learning, researching, and building.
 links:
   - label: Email me
@@ -13,15 +13,31 @@ tags:
   - optimization
   - agent systems
 visibility: public
-updatedAt: "2026-09-28"
+updatedAt: "2026-10-31"
 ---
 
-AI + X, and X + AI: I use ideas from applied mathematics to make AI systems
-work better, and I’m curious how AI can return the favor in science and
-engineering.
+<img src="/images/avatar-pixel.png" alt="Pixelated selfie on a snowfield above 5,000 m" class="about-avatar" width="280" height="370" loading="lazy" />
+<p class="about-avatar__caption">Shot by me on a snowfield above 5,000 m — straight from the camera, unedited except for the pixels. Shared as-is.</p>
 
-My current research focuses on optimization and infrastructure for AI-agent
-workflows, including scheduling and reliable execution. I also work on
-mathematical modeling and numerical analysis of biological systems. I’m open
-to research collaborations and internship opportunities in applied
+My main research interest lies in optimization and infrastructure for
+AI-agent workflows. More broadly, I am drawn to mathematically grounded
+problems whose impact can be observed in real-world systems — from biological
+pattern formation and scientific computing to AI-driven decision-making.
+
+My research philosophy is grounded in concrete, real-world problems. Good
+research should begin with finding the right level of abstraction. I believe
+models should follow Occam’s razor: simpler formulations generalize better.
+The goal is never mathematical complexity for its own sake, but choosing the
+right mathematical tools to either explain an underlying phenomenon or
+optimize a practical bottleneck. Crucially, any theoretical insight is only
+complete when verified by real-world data and experiments.
+
+I took an odd path into research. I started with algorithms as an
+undergraduate, then, out of a love for interdisciplinary work, moved to
+modeling complex biological and geological systems — a detour that took me to
+plateaus and snowfields above 5,000 m, where I first felt the beauty of
+nature in person. For various reasons I did not continue in that line, but
+what I learned there still shapes how I think about models and abstraction.
+
+I’m open to research collaborations and internship opportunities in applied
 mathematics, AI systems, and research engineering.

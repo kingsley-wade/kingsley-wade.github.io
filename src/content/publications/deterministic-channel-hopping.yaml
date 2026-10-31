@@ -9,10 +9,13 @@ kind: working-paper
 status: under-review
 venue: SIAM
 order: 50
-links: []
+url: https://drive.google.com/file/d/1iFqwIxYBBEtUmA8VOvEefT5MZHGhnZym/view?usp=drive_link
+links:
+  - label: PDF
+    url: https://drive.google.com/file/d/1iFqwIxYBBEtUmA8VOvEefT5MZHGhnZym/view?usp=drive_link
 tags:
   - modeling
   - simulation
   - wireless networks
 visibility: public
-updatedAt: "2026-10-29"
+updatedAt: "2026-10-31"

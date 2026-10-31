@@ -52,7 +52,9 @@ try {
   const compressedBytes = await files.reduce(async (totalPromise, path) => {
     const total = await totalPromise;
     const pathname = relative(root, path).replaceAll("\\", "/");
-    if (pathname.startsWith("audio/")) return total;
+    // Lazy content assets (audio clips, gallery photos) are excluded from the
+    // initial-output budget; they load on demand and are not render-blocking.
+    if (pathname.startsWith("audio/") || pathname.startsWith("images/")) return total;
     const bytes = await readFile(path);
     return total + gzipSync(bytes).byteLength;
   }, Promise.resolve(0));

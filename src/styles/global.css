@@ -175,6 +175,16 @@ button:active {
   font-weight: 600;
 }
 
+.splash-gate__avatar {
+  width: 8rem;
+  height: 8rem;
+  margin-block-start: var(--space-5);
+  border: var(--line-pixel) solid var(--color-ink);
+  background: var(--color-surface);
+  box-shadow: 6px 6px 0 var(--color-terminal-border);
+  image-rendering: pixelated;
+}
+
 .splash-gate h1 {
   max-width: 14ch;
   margin: var(--space-6) 0;

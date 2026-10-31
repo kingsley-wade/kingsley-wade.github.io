@@ -38,3 +38,6 @@ template-dist/
 .DS_Store
 *.swp
 *.swo
+
+# Private photo stash — never publish raw originals
+/referencepaper/

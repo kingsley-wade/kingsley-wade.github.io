@@ -16,9 +16,6 @@ visibility: public
 updatedAt: "2026-10-31"
 ---
 
-<img src="/images/avatar-pixel.png" alt="Pixelated selfie on a snowfield above 5,000 m" class="about-avatar" width="280" height="370" loading="lazy" />
-<p class="about-avatar__caption">Shot by me on a snowfield above 5,000 m — straight from the camera, unedited except for the pixels. Shared as-is.</p>
-
 My main research interest lies in optimization and infrastructure for
 AI-agent workflows. More broadly, I am drawn to mathematically grounded
 problems whose impact can be observed in real-world systems — from biological

@@ -1,39 +1,59 @@
 ---
 import { withBase } from "../config/site";
-import { photos } from "../content/photos/gallery";
+import { photoGroups } from "../content/photos/gallery";
 
-const gallery = photos.map((photo) => ({
-  ...photo,
-  src: withBase(photo.src),
+const groups = photoGroups.map((group) => ({
+  ...group,
+  photos: group.photos.map((photo) => ({
+    ...photo,
+    src: withBase(photo.src),
+  })),
 }));
 ---
 
 <section class="photo-gallery" aria-label="Photo gallery" data-photo-gallery>
-  {gallery.length > 0 ? (
-    <div class="photo-gallery__grid">
-      {gallery.map((photo) => (
-        <button
-          class="photo-gallery__tile"
-          type="button"
-          data-photo-open={photo.id}
-          aria-haspopup="dialog"
-        >
-          <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" />
-        </button>
-      ))}
-    </div>
-  ) : (
-    <p class="photo-gallery__empty">
-      Add a photo under <code>public/images/photos/</code>, then register its path and alt text in
-      <code>src/content/photos/gallery.ts</code>.
-    </p>
-  )}
+  <div class="photo-groups">
+    {
+      groups.map((group) => (
+        <div class="photo-group" data-photo-group={group.id}>
+          <button
+            type="button"
+            class="photo-group__header"
+            data-photo-group-toggle
+            aria-expanded="false"
+            aria-controls={`photo-group-panel-${group.id}`}
+          >
+            <span class="photo-group__marker" aria-hidden="true">&gt;</span>
+            <span class="photo-group__title">{group.title}</span>
+            <span class="photo-group__blurb">{group.blurb}</span>
+            <span class="photo-group__count">[{group.photos.length}]</span>
+          </button>
+          <div class="photo-group__panel" id={`photo-group-panel-${group.id}`} hidden>
+            <div class="photo-gallery__grid">
+              {group.photos.map((photo) => (
+                <button
+                  class="photo-gallery__tile"
+                  type="button"
+                  data-photo-open={photo.id}
+                  data-photo-caption={photo.caption}
+                  aria-haspopup="dialog"
+                >
+                  <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
 
   <dialog class="photo-gallery__dialog" data-photo-dialog aria-label="Photo viewer">
     <button class="photo-gallery__close" type="button" data-photo-close aria-label="Close photo viewer">
       Close
     </button>
     <img data-photo-dialog-image alt="" />
+    <p class="photo-gallery__dialog-caption" data-photo-dialog-caption hidden></p>
   </dialog>
 </section>
 

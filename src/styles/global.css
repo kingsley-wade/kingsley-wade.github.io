@@ -1050,6 +1050,78 @@ html:has(.playground-card[open]) {
   line-height: 1.8;
 }
 
+.photo-groups {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.photo-group__header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: var(--line-pixel) solid var(--color-ink);
+  background: var(--color-surface);
+  box-shadow: 4px 4px 0 var(--color-terminal-border);
+  color: var(--color-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.photo-group__header:hover {
+  background: var(--color-surface-mint);
+}
+
+.photo-group__header:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+.photo-group__marker {
+  flex: none;
+  color: var(--color-ink);
+  font-family: var(--font-mono, monospace);
+  transition: transform 0.15s ease;
+}
+
+.photo-group__header[aria-expanded="true"] .photo-group__marker {
+  transform: rotate(90deg);
+}
+
+.photo-group__title {
+  flex: none;
+  font-weight: 700;
+}
+
+.photo-group__blurb {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-ink-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.photo-group__count {
+  flex: none;
+  margin-inline-start: auto;
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85em;
+}
+
+.photo-group__panel {
+  padding: var(--space-4) 0 0;
+}
+
+.photo-gallery__dialog-caption {
+  margin: var(--space-2) 0 0;
+  color: var(--color-ink-muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 .photo-gallery__dialog {
   position: relative;
   width: min(92vw, 68rem);
@@ -1070,7 +1142,7 @@ html:has(.playground-card[open]) {
 .photo-gallery__dialog img {
   display: block;
   width: 100%;
-  max-height: calc(92vh - 5rem);
+  max-height: calc(92vh - 7.5rem);
   object-fit: contain;
   background: var(--color-canvas);
 }
@@ -1664,26 +1736,4 @@ html:has(.playground-card[open]) {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-.about-avatar {
-  display: block;
-  width: 280px;
-  max-width: 100%;
-  height: auto;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 1px 2px color-mix(in srgb, var(--color-ink) 8%, transparent),
-    0 12px 28px color-mix(in srgb, var(--color-ink) 12%, transparent);
-  image-rendering: pixelated;
-}
-
-.about-avatar__caption {
-  margin-block-start: var(--space-2);
-  max-width: 34em;
-  color: var(--color-ink-muted);
-  font-size: 0.85rem;
-  line-height: 1.6;
 }

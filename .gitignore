@@ -20,6 +20,20 @@ template-dist/
 /idphoto.jpg
 /cvfor_applied_math/
 
+# CV build artifacts and transfer archives
+/cv/*.aux
+/cv/*.bcf
+/cv/*.fdb_latexmk
+/cv/*.fls
+/cv/*.log
+/cv/*.out
+/cv/*.pdf
+/cv/*.xdv
+/cv/comment.cut
+/cv-preview-*.pdf
+/Curriculum_Vitae.zip
+/cv-overleaf.zip
+
 # Operating system and editor files
 .DS_Store
 *.swp

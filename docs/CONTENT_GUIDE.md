@@ -83,14 +83,17 @@ properly licensed before pushing it to GitHub Pages.
 ## Source ledger
 
 The initial personal facts were transcribed from these ignored local inputs on
-2026-09-28:
+2026-09-28. Since 2026-10-28 the primary local source is `cv/` (the newer CV
+directory); `cvfor_applied_math/` is kept only as the earlier draft.
 
-| Public content | Local source | Editing decision |
+| Public content | Local source (primary) | Editing decision |
 | --- | --- | --- |
-| Name and email | `cvfor_applied_math/cv-llt.tex` | Published as written; email was approved for public display. |
-| Graduate program | `cvfor_applied_math/education.tex` | Preserved as "Graduate Program"; no master's or doctoral label inferred. |
-| B.Sc. and thesis | `cvfor_applied_math/education.tex` | Honors and thesis retained; GPA and secondary education omitted by default. |
-| Research projects | `cvfor_applied_math/employment.tex` | Dates, topics, contribution wording, and supplied links condensed without adding claims. |
-| Research interests | `cvfor_applied_math/skills.tex` | Condensed into the About introduction. |
+| Name and email | `cv/cv-llt.tex` | Published as written; email was approved for public display. |
+| Graduate program | `cv/education.tex` | Ph.D. program, supervisors, and joint institute wording follow the CV. |
+| B.Sc. and thesis | `cv/education.tex` | Honors and thesis retained; GPA and secondary education omitted by default. |
+| Research projects | `cv/employment.tex` | Dates, topics, contribution wording, and supplied links condensed without adding claims. |
+| Engineering and open-source work | `cv/engineering.tex` | Condensed without adding claims. |
+| Research interests | `cv/skills.tex` | Condensed into the About introduction. |
 
-The source files remain ignored and are not copied into the production build.
+The `cv/` source files are used for transcription only and are not copied into
+the production build.

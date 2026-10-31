@@ -76,7 +76,7 @@ test("publications groups by status and misc content is available", async ({ pag
   await expect(panel.locator('[data-publication-group="under-review"]')).toContainText(
     "OpenReview",
   );
-  await expect(panel.locator('[data-publication-group="preprint"]')).toContainText(
+  await expect(panel.locator('[data-publication-group="under-review"]')).toContainText(
     "Subcube Partitions",
   );
 

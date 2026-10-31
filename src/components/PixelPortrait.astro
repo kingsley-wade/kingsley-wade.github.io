@@ -1,18 +1,17 @@
 ---
 import { withBase } from "../config/site";
 
-const avatar = withBase("images/avatar-pixel.webp");
-const avatar2x = withBase("images/avatar-pixel@2x.webp");
+const avatar = withBase("images/avatar-cartoon.webp");
 ---
 
 <picture class="terminal-identity__portrait">
   <img
     src={avatar}
-    srcset={`${avatar} 384w, ${avatar2x} 768w`}
+    srcset={`${avatar} 480w`}
     sizes="(max-width: 480px) 120px, 200px"
-    width="384"
-    height="384"
-    alt="Pixel portrait of Manting Guo"
+    width="480"
+    height="480"
+    alt="Pixel-art cartoon avatar of Manting Guo"
     decoding="async"
     fetchpriority="high"
   />

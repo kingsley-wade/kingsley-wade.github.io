@@ -47,7 +47,7 @@ export const initSiteTerminal = (
       return;
     }
     const effect = executeTerminalCommand(parsed.command, parsed.args, filesystem);
-    if (parsed.command === "cd" && parsed.args[0] === "~") {
+    if (parsed.command === "cd" && parsed.args?.[0] === "~") {
       window.location.hash = "home";
       appendLine("moved to ~ (home)", "output");
       return;

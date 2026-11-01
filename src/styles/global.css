@@ -1095,14 +1095,6 @@ html:has(.playground-card[open]) {
   font-weight: 700;
 }
 
-.photo-group__blurb {
-  min-width: 0;
-  overflow: hidden;
-  color: var(--color-ink-muted);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .photo-group__count {
   flex: none;
   margin-inline-start: auto;

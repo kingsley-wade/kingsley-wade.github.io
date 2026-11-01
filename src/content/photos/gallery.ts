@@ -8,7 +8,6 @@ export type PhotoItem = {
 export type PhotoGroup = {
   id: string;
   title: string;
-  blurb: string;
   photos: readonly PhotoItem[];
 };
 
@@ -16,7 +15,6 @@ export const photoGroups: readonly PhotoGroup[] = [
   {
     id: "snow-ice",
     title: "Snow & ice",
-    blurb: "Peaks, frozen lakes, and ice crystals above 4,000 m.",
     photos: [
       {
         id: "snow-mountain",
@@ -38,12 +36,17 @@ export const photoGroups: readonly PhotoGroup[] = [
         src: "/images/photos/ice-crystals.jpg",
         alt: "Close-up of coarse ice crystals growing over dark soil",
       },
+      {
+        id: "snowfield-selfie",
+        src: "/images/photos/snowfield-selfie.jpg",
+        alt: "Selfie in an orange jacket and beanie on a rocky snowfield",
+        caption: "Shot over 5,500+ m",
+      },
     ],
   },
   {
     id: "plateau-textures",
     title: "Plateau textures",
-    blurb: "Patterns the plateau draws on itself — hummocks, salt crusts, fairy circles.",
     photos: [
       {
         id: "plateau-hummocks",
@@ -65,7 +68,6 @@ export const photoGroups: readonly PhotoGroup[] = [
   {
     id: "roads-passes",
     title: "Roads & passes",
-    blurb: "Between field sites: switchbacks, passes, and the roadside.",
     photos: [
       {
         id: "tianlu-eighteen-bends",
@@ -85,9 +87,8 @@ export const photoGroups: readonly PhotoGroup[] = [
     ],
   },
   {
-    id: "life-water",
-    title: "Life & water",
-    blurb: "Shorelines, and the birds along them.",
+    id: "others",
+    title: "Others",
     photos: [
       {
         id: "reservoir-shore",
@@ -98,19 +99,6 @@ export const photoGroups: readonly PhotoGroup[] = [
         id: "kingfisher",
         src: "/images/photos/kingfisher.jpg",
         alt: "A common kingfisher perched on a wooden post, feathers bright blue and orange",
-      },
-    ],
-  },
-  {
-    id: "me-out-there",
-    title: "Me out there",
-    blurb: "Proof that I was actually there.",
-    photos: [
-      {
-        id: "snowfield-selfie",
-        src: "/images/photos/snowfield-selfie.jpg",
-        alt: "Selfie in an orange jacket and beanie on a rocky snowfield",
-        caption: "Shot from 5,000+ m",
       },
     ],
   },

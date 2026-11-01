@@ -25,7 +25,6 @@ const groups = photoGroups.map((group) => ({
           >
             <span class="photo-group__marker" aria-hidden="true">&gt;</span>
             <span class="photo-group__title">{group.title}</span>
-            <span class="photo-group__blurb">{group.blurb}</span>
             <span class="photo-group__count">[{group.photos.length}]</span>
           </button>
           <div class="photo-group__panel" id={`photo-group-panel-${group.id}`} hidden>

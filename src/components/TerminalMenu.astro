@@ -25,6 +25,12 @@ const { sections } = Astro.props;
     <span class="side-menu__toggle-label">FILES</span>
   </button>
   <ol id="side-menu-list" class="side-menu__list">
+    <li>
+      <a href="#home" data-home-link>
+        <span aria-hidden="true">[~]</span>
+        <span>HOME</span>
+      </a>
+    </li>
     {
       sections.map((section, index) => (
         <li>
@@ -59,7 +65,7 @@ const { sections } = Astro.props;
     });
 
     menu.querySelector(".side-menu__list")?.addEventListener("click", (event) => {
-      if ((event.target as HTMLElement).closest("[data-section-link]")) {
+      if ((event.target as HTMLElement).closest("[data-section-link], [data-home-link]")) {
         setCollapsed(true);
       }
     });

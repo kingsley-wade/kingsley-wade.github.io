@@ -113,6 +113,9 @@ export const initSectionRouter = (): (() => void) => {
   const links = Array.from(
     document.querySelectorAll<HTMLAnchorElement>("[data-section-link]"),
   );
+  const homeLinks = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>("[data-home-link]"),
+  );
   const panels = Array.from(
     document.querySelectorAll<HTMLElement>("[data-section-panel]"),
   );
@@ -132,11 +135,16 @@ export const initSectionRouter = (): (() => void) => {
         panel.dataset.active = String(active);
         panel.hidden = !active;
       }
+      if (id === null) window.scrollTo({ top: 0, behavior: "instant" });
       for (const link of links) {
         if (link.dataset.sectionLink === id) link.setAttribute("aria-current", "page");
         else link.removeAttribute("aria-current");
       }
       document.documentElement.dataset.activeSection = id ?? "";
+      for (const homeLink of homeLinks) {
+        if (id === null) homeLink.setAttribute("aria-current", "page");
+        else homeLink.removeAttribute("aria-current");
+      }
       const activeLink = links.find((link) => link.dataset.sectionLink === id);
       window.dispatchEvent(
         new CustomEvent("section:changed", {
@@ -168,6 +176,15 @@ export const initSectionRouter = (): (() => void) => {
   const router = createSectionRouter(routes, adapter);
 
   const onClick = (event: MouseEvent) => {
+    const homeLink = (event.target as HTMLElement).closest<HTMLAnchorElement>(
+      "[data-home-link]",
+    );
+    if (homeLink) {
+      event.preventDefault();
+      adapter.pushHash(`#${HOME_ID}`);
+      router.syncFromLocation(true);
+      return;
+    }
     const link = (event.target as HTMLElement).closest<HTMLAnchorElement>(
       "[data-section-link]",
     );

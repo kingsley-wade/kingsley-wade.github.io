@@ -5,7 +5,7 @@ test("sound preference controls the persistent background track", async ({
 }) => {
   const trackRequests: string[] = [];
   page.on("request", (request) => {
-    if (request.url().includes("/audio/mock/")) {
+    if (request.url().includes("/audio/coffee-on-the-balcony.mp3")) {
       trackRequests.push(request.url());
     }
   });

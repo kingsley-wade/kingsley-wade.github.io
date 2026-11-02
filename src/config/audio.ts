@@ -32,61 +32,19 @@ export type AudioConfig = {
 
 const configuredTrackUrl = import.meta.env.PUBLIC_BACKGROUND_AUDIO_URL?.trim();
 
+// Full-track loop: snippetDurationSeconds >= track duration keeps the
+// timeupdate watchdog from restarting playback; `loop: true` handles replay.
 const bundledTracks: readonly BackgroundTrack[] = [
   {
-    id: "waltz-for-window-seat",
-    title: "A Waltz for the Window Seat",
+    id: "coffee-on-the-balcony",
+    title: "Coffee on the Balcony",
     artist: "Owner supplied",
-    source: withBase("audio/mock/A_Waltz_for_the_Window_Seat.ogg"),
+    source: withBase("audio/coffee-on-the-balcony.mp3"),
     sourceKind: "owner-supplied",
     licenseNote: "Confirm publishing rights before deploying this file publicly.",
-    loop: false,
+    loop: true,
     snippetStartSeconds: 0,
-    snippetDurationSeconds: 30,
-  },
-  {
-    id: "midnight-on-the-balcony",
-    title: "Midnight on the Balcony",
-    artist: "Owner supplied",
-    source: withBase("audio/mock/Midnight_on_the_Balcony.ogg"),
-    sourceKind: "owner-supplied",
-    licenseNote: "Confirm publishing rights before deploying this file publicly.",
-    loop: false,
-    snippetStartSeconds: 0,
-    snippetDurationSeconds: 30,
-  },
-  {
-    id: "room-still-holds-you",
-    title: "The Room Still Holds You",
-    artist: "Owner supplied",
-    source: withBase("audio/mock/The_Room_Still_Holds_You.ogg"),
-    sourceKind: "owner-supplied",
-    licenseNote: "Confirm publishing rights before deploying this file publicly.",
-    loop: false,
-    snippetStartSeconds: 0,
-    snippetDurationSeconds: 30,
-  },
-  {
-    id: "city-of-stars-fingerstyle",
-    title: "City of Stars (Fingerstyle)",
-    artist: "Owner supplied",
-    source: withBase("audio/mock/city_of_stars_fingerstyle%202.ogg"),
-    sourceKind: "owner-supplied",
-    licenseNote: "Confirm publishing rights before deploying this file publicly.",
-    loop: false,
-    snippetStartSeconds: 0,
-    snippetDurationSeconds: 30,
-  },
-  {
-    id: "original-piece",
-    title: "Original Piece",
-    artist: "Owner supplied",
-    source: withBase("audio/mock/original_piece_30s.ogg"),
-    sourceKind: "owner-supplied",
-    licenseNote: "Confirm publishing rights before deploying this file publicly.",
-    loop: false,
-    snippetStartSeconds: 0,
-    snippetDurationSeconds: 30,
+    snippetDurationSeconds: 181,
   },
 ];
 

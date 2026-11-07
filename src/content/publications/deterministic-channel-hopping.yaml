@@ -5,9 +5,10 @@ authors:
   - Manting Guo
   - Peiru Kuang
   - Yan Wang
-kind: working-paper
-status: under-review
-venue: SIAM
+kind: conference
+status: accepted
+venue: SIAM ACDA 2027
+year: 2027
 order: 50
 url: https://drive.google.com/file/d/1iFqwIxYBBEtUmA8VOvEefT5MZHGhnZym/view?usp=drive_link
 links:
@@ -18,4 +19,4 @@ tags:
   - simulation
   - wireless networks
 visibility: public
-updatedAt: "2026-10-31"
+updatedAt: "2026-11-07"

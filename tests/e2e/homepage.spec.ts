@@ -73,6 +73,9 @@ test("publications groups by status and misc content is available", async ({ pag
   await expect(panel.locator('[data-publication-group="published"]')).toContainText(
     "Biomolecular condensates",
   );
+  await expect(panel.locator('[data-publication-group="published"]')).toContainText(
+    "Channel Hopping",
+  );
   await expect(panel.locator('[data-publication-group="under-review"]')).toContainText(
     "OpenReview",
   );

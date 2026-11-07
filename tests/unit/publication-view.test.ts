@@ -9,7 +9,7 @@ import {
 describe("publication view model", () => {
   it("renders all supported status labels", () => {
     expect(mockPublicationEntries.map(toPublicationView).map(({ statusLabel }) => statusLabel))
-      .toEqual(["Published", "Accepted", "Under review", "In progress"]);
+      .toEqual(["Published", "Accepted (Oral)", "Under review", "In progress"]);
   });
 
   it("groups publications into published, under-review, and preprint", () => {

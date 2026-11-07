@@ -10,7 +10,7 @@ export type PublicationView = PublicationData & {
 
 const statusLabels: Record<PublicationData["status"], string> = {
   published: "Published",
-  accepted: "Accepted",
+  accepted: "Accepted (Oral)",
   preprint: "Preprint",
   "under-review": "Under review",
   "in-progress": "In progress",

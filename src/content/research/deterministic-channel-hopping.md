@@ -13,7 +13,7 @@ tags:
   - optimization
   - wireless networks
 visibility: public
-updatedAt: "2026-10-31"
+updatedAt: "2026-11-07"
 ---
 
 Authors: Manting Guo, Peiru Kuang, and Yan Wang.
@@ -21,4 +21,5 @@ Authors: Manting Guo, Peiru Kuang, and Yan Wang.
 Standard frequency-hopping metrics can mask controller-state blind spots. I
 formulated deterministic hopping as directed-cycle coverage and developed a
 layer-aware MILP and LCCM heuristic to maximize context coverage and resolve
-structural bottlenecks. The paper is under submission.
+structural bottlenecks. The paper was accepted at SIAM ACDA 2027 for
+publication and oral presentation.
